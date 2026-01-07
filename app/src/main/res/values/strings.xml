@@ -1,0 +1,74 @@
+<resources>
+    <string name="app_name">DevInfo</string>
+    
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_device">Device</string>
+    <string name="nav_hardware">Hardware</string>
+    <string name="nav_battery">Battery</string>
+    <string name="nav_network">Network</string>
+    <string name="nav_display">Display</string>
+    <string name="nav_camera">Camera</string>
+    
+    <!-- Home Screen -->
+    <string name="home_title">Device Information</string>
+    <string name="home_subtitle">Quick Overview</string>
+    
+    <!-- Device Screen -->
+    <string name="device_title">Device Details</string>
+    <string name="device_name">Device Name</string>
+    <string name="manufacturer">Manufacturer</string>
+    <string name="model">Model</string>
+    <string name="brand">Brand</string>
+    <string name="android_version">Android Version</string>
+    <string name="api_level">API Level</string>
+    <string name="build_fingerprint">Build Fingerprint</string>
+    <string name="security_patch">Security Patch</string>
+    
+    <!-- Hardware Screen -->
+    <string name="hardware_title">Hardware Information</string>
+    <string name="total_ram">Total RAM</string>
+    <string name="available_ram">Available RAM</string>
+    <string name="total_storage">Total Storage</string>
+    <string name="available_storage">Available Storage</string>
+    <string name="cpu_info">CPU Information</string>
+    <string name="cpu_cores">CPU Cores</string>
+    
+    <!-- Battery Screen -->
+    <string name="battery_title">Battery Information</string>
+    <string name="battery_level">Battery Level</string>
+    <string name="charging_status">Charging Status</string>
+    <string name="temperature">Temperature</string>
+    <string name="voltage">Voltage</string>
+    <string name="health">Health</string>
+    <string name="technology">Technology</string>
+    <string name="refresh">Refresh</string>
+    
+    <!-- Network Screen -->
+    <string name="network_title">Network Information</string>
+    <string name="connection_type">Connection Type</string>
+    <string name="network_name">Network Name</string>
+    <string name="ip_address">IP Address</string>
+    <string name="signal_strength">Signal Strength</string>
+    
+    <!-- Display Screen -->
+    <string name="display_title">Display Information</string>
+    <string name="resolution">Resolution</string>
+    <string name="screen_size">Screen Size</string>
+    <string name="pixel_density">Pixel Density</string>
+    <string name="refresh_rate">Refresh Rate</string>
+    
+    <!-- Camera Screen -->
+    <string name="camera_title">Camera Information</string>
+    <string name="camera_count">Camera Count</string>
+    <string name="camera_id">Camera ID</string>
+    <string name="facing">Facing</string>
+    <string name="flash_available">Flash Available</string>
+    <string name="sensor_orientation">Sensor Orientation</string>
+    
+    <!-- Common -->
+    <string name="unknown">Unknown</string>
+    <string name="not_available">N/A</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+</resources>
