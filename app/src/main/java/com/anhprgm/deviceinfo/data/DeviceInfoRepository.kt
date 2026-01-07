@@ -147,8 +147,8 @@ class DeviceInfoRepository(private val context: Context) {
         
         val signalStrength = if (capabilities?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true) {
             val rssi = wifiInfo.rssi
-            val level = WifiManager.calculateSignalLevel(rssi, 5)
-            "$level/4 (${rssi} dBm)"
+            val level = WifiManager.calculateSignalLevel(rssi, 4)
+            "$level/3 (${rssi} dBm)"
         } else {
             "N/A"
         }
