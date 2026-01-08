@@ -6,14 +6,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.Apps
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
@@ -26,6 +21,10 @@ import com.anhprgm.deviceinfo.ui.components.InfoCard
 import com.anhprgm.deviceinfo.ui.components.LoadingState
 import com.anhprgm.deviceinfo.ui.viewmodel.DeviceInfoViewModel
 
+enum class SortOption {
+    NAME_ASC, NAME_DESC, INSTALL_DATE_ASC, INSTALL_DATE_DESC, PACKAGE_NAME
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppManagerScreen(
@@ -34,6 +33,11 @@ fun AppManagerScreen(
     onNavigateToAppDetail: (AppInfo) -> Unit
 ) {
     val appManagerInfo by viewModel.appManagerInfo.collectAsState()
+    var searchQuery by remember { mutableStateOf("") }
+    var sortOption by remember { mutableStateOf(SortOption.NAME_ASC) }
+    var showSortMenu by remember { mutableStateOf(false) }
+    var filterType by remember { mutableStateOf("All") }
+    var showFilterMenu by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.loadAppManagerInfo()
@@ -53,23 +57,128 @@ fun AppManagerScreen(
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 },
+                actions = {
+                    IconButton(onClick = { showFilterMenu = true }) {
+                        Icon(Icons.Default.FilterList, contentDescription = "Filter")
+                    }
+                    DropdownMenu(
+                        expanded = showFilterMenu,
+                        onDismissRequest = { showFilterMenu = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("All Apps") },
+                            onClick = {
+                                filterType = "All"
+                                showFilterMenu = false
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("User Apps") },
+                            onClick = {
+                                filterType = "User"
+                                showFilterMenu = false
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("System Apps") },
+                            onClick = {
+                                filterType = "System"
+                                showFilterMenu = false
+                            }
+                        )
+                    }
+                    
+                    IconButton(onClick = { showSortMenu = true }) {
+                        Icon(Icons.Default.Sort, contentDescription = "Sort")
+                    }
+                    DropdownMenu(
+                        expanded = showSortMenu,
+                        onDismissRequest = { showSortMenu = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Name (A-Z)") },
+                            onClick = {
+                                sortOption = SortOption.NAME_ASC
+                                showSortMenu = false
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Name (Z-A)") },
+                            onClick = {
+                                sortOption = SortOption.NAME_DESC
+                                showSortMenu = false
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Install Date (Newest)") },
+                            onClick = {
+                                sortOption = SortOption.INSTALL_DATE_DESC
+                                showSortMenu = false
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Install Date (Oldest)") },
+                            onClick = {
+                                sortOption = SortOption.INSTALL_DATE_ASC
+                                showSortMenu = false
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Package Name") },
+                            onClick = {
+                                sortOption = SortOption.PACKAGE_NAME
+                                showSortMenu = false
+                            }
+                        )
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
+                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                    actionIconContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             )
         }
     ) { paddingValues ->
         appManagerInfo?.let { appManager ->
-            val maxAppsToShow = 50
+            // Filter and sort apps
+            val filteredApps = remember(appManager.apps, searchQuery, filterType, sortOption) {
+                var apps = appManager.apps
+                
+                // Apply search filter
+                if (searchQuery.isNotEmpty()) {
+                    apps = apps.filter { app ->
+                        app.appName.contains(searchQuery, ignoreCase = true) ||
+                        app.packageName.contains(searchQuery, ignoreCase = true)
+                    }
+                }
+                
+                // Apply type filter
+                apps = when (filterType) {
+                    "User" -> apps.filter { !it.packageName.startsWith("com.android") && 
+                                           !it.packageName.startsWith("android") }
+                    "System" -> apps.filter { it.packageName.startsWith("com.android") || 
+                                              it.packageName.startsWith("android") }
+                    else -> apps
+                }
+                
+                // Apply sorting
+                when (sortOption) {
+                    SortOption.NAME_ASC -> apps.sortedBy { it.appName.lowercase() }
+                    SortOption.NAME_DESC -> apps.sortedByDescending { it.appName.lowercase() }
+                    SortOption.INSTALL_DATE_ASC -> apps.sortedBy { it.installTime }
+                    SortOption.INSTALL_DATE_DESC -> apps.sortedByDescending { it.installTime }
+                    SortOption.PACKAGE_NAME -> apps.sortedBy { it.packageName }
+                }
+            }
             
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
                     .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 item {
                     InfoCard(title = "Overview") {
@@ -78,10 +187,32 @@ fun AppManagerScreen(
                         DetailRow(label = "User Apps", value = appManager.userApps.toString())
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                         DetailRow(label = "System Apps", value = appManager.systemApps.toString())
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                        DetailRow(label = "Filtered", value = filteredApps.size.toString())
                     }
                 }
+                
+                item {
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        placeholder = { Text("Search apps...") },
+                        leadingIcon = {
+                            Icon(Icons.Default.Search, contentDescription = "Search")
+                        },
+                        trailingIcon = {
+                            if (searchQuery.isNotEmpty()) {
+                                IconButton(onClick = { searchQuery = "" }) {
+                                    Icon(Icons.Default.Clear, contentDescription = "Clear")
+                                }
+                            }
+                        },
+                        singleLine = true
+                    )
+                }
 
-                items(appManager.apps.take(maxAppsToShow)) { app ->
+                items(filteredApps, key = { it.packageName }) { app ->
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -94,18 +225,18 @@ fun AppManagerScreen(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp),
+                                .padding(12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            // App Icon
+                            // App Icon - Load lazily
                             app.icon?.let { drawable ->
                                 Image(
-                                    bitmap = drawable.toBitmap(96, 96).asImageBitmap(),
+                                    bitmap = drawable.toBitmap(48, 48).asImageBitmap(),
                                     contentDescription = "App Icon",
-                                    modifier = Modifier.size(48.dp)
+                                    modifier = Modifier.size(40.dp)
                                 )
                             } ?: Box(
-                                modifier = Modifier.size(48.dp),
+                                modifier = Modifier.size(40.dp),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
@@ -115,17 +246,18 @@ fun AppManagerScreen(
                                 )
                             }
                             
-                            Spacer(modifier = Modifier.width(16.dp))
+                            Spacer(modifier = Modifier.width(12.dp))
                             
                             // App Info
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
                                     text = app.appName,
-                                    style = MaterialTheme.typography.titleMedium,
+                                    style = MaterialTheme.typography.titleSmall,
                                     fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.primary
+                                    color = MaterialTheme.colorScheme.primary,
+                                    maxLines = 1
                                 )
-                                Spacer(modifier = Modifier.height(4.dp))
+                                Spacer(modifier = Modifier.height(2.dp))
                                 
                                 Text(
                                     text = app.packageName,
@@ -133,7 +265,7 @@ fun AppManagerScreen(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     maxLines = 1
                                 )
-                                Spacer(modifier = Modifier.height(4.dp))
+                                Spacer(modifier = Modifier.height(2.dp))
                                 
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
@@ -145,7 +277,7 @@ fun AppManagerScreen(
                                     )
                                     if (app.permissions.isNotEmpty()) {
                                         Text(
-                                            text = "${app.permissions.size}+ permissions",
+                                            text = "${app.permissions.size}+ perms",
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.secondary
                                         )
@@ -158,20 +290,9 @@ fun AppManagerScreen(
                                 imageVector = Icons.Default.ChevronRight,
                                 contentDescription = "View Details",
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.size(24.dp)
+                                modifier = Modifier.size(20.dp)
                             )
                         }
-                    }
-                }
-
-                if (appManager.apps.size > maxAppsToShow) {
-                    item {
-                        Text(
-                            text = "Showing first $maxAppsToShow apps out of ${appManager.apps.size}",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(16.dp)
-                        )
                     }
                 }
             }

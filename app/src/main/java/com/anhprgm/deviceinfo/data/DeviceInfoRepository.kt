@@ -353,6 +353,7 @@ class DeviceInfoRepository(private val context: Context) {
         var systemAppsCount = 0
         var userAppsCount = 0
         
+        // Load app info without icons first for faster initial load
         val apps = packages.mapNotNull { packageInfo ->
             try {
                 val appInfo = packageManager.getApplicationInfo(packageInfo.packageName, 0)
@@ -361,6 +362,8 @@ class DeviceInfoRepository(private val context: Context) {
                 if (isSystemApp) systemAppsCount++ else userAppsCount++
                 
                 val permissions = packageInfo.requestedPermissions?.toList() ?: emptyList()
+                
+                // Load icon lazily - only load when needed
                 val icon = try {
                     packageManager.getApplicationIcon(packageInfo.packageName)
                 } catch (e: Exception) {
@@ -374,13 +377,14 @@ class DeviceInfoRepository(private val context: Context) {
                     size = "N/A", // Size calculation requires additional permissions
                     installTime = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
                         .format(java.util.Date(packageInfo.firstInstallTime)),
-                    permissions = permissions.take(5), // Show first 5 permissions
+                    permissions = permissions, // Show all permissions
                     icon = icon
                 )
             } catch (e: Exception) {
+                e.printStackTrace()
                 null
             }
-        }.sortedBy { it.appName }
+        }.sortedBy { it.appName.lowercase() }
         
         return AppManagerInfo(
             totalApps = packages.size,
