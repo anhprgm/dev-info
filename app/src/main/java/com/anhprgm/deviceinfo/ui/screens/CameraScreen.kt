@@ -66,15 +66,40 @@ fun CameraScreen(
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                         DetailRow(label = "Facing", value = cameraDetail.facing)
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                        DetailRow(label = "Resolution", value = cameraDetail.megapixels)
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                        DetailRow(label = "Image Size", value = cameraDetail.imageSize)
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                        DetailRow(label = "Focal Length", value = cameraDetail.focalLength)
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                        DetailRow(label = "Aperture", value = cameraDetail.aperture)
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                         DetailRow(
                             label = "Flash Available",
                             value = if (cameraDetail.flashAvailable) "Yes" else "No"
                         )
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                         DetailRow(
+                            label = "Optical Stabilization",
+                            value = if (cameraDetail.opticalStabilization) "Yes" else "No"
+                        )
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                        DetailRow(
+                            label = "Auto Exposure Lock",
+                            value = if (cameraDetail.autoExposureLock) "Yes" else "No"
+                        )
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                        DetailRow(
+                            label = "Auto White Balance Lock",
+                            value = if (cameraDetail.autoWhiteBalanceLock) "Yes" else "No"
+                        )
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                        DetailRow(
                             label = "Sensor Orientation",
                             value = "${cameraDetail.sensorOrientation}°"
                         )
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                        DetailRow(label = "Output Formats", value = cameraDetail.outputFormats)
                     }
                 }
             }

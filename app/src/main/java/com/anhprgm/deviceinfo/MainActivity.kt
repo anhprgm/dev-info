@@ -64,7 +64,8 @@ fun DevInfoApp() {
                 onNavigateToHistory = { navController.navigate("history") },
                 onNavigateToAppManager = { navController.navigate("appmanager") },
                 onNavigateToMonitoring = { navController.navigate("monitoring") },
-                onNavigateToBenchmark = { navController.navigate("benchmark") }
+                onNavigateToBenchmark = { navController.navigate("benchmark") },
+                onNavigateToSettings = { navController.navigate("settings") }
             )
         }
         composable("device") {
@@ -144,6 +145,11 @@ fun DevInfoApp() {
         composable("benchmark") {
             BenchmarkScreen(
                 viewModel = viewModel,
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+        composable("settings") {
+            SettingsScreen(
                 onNavigateBack = { navController.popBackStack() }
             )
         }

@@ -226,12 +226,76 @@ class DeviceInfoRepository(private val context: Context) {
                 
                 val flashAvailable = characteristics.get(CameraCharacteristics.FLASH_INFO_AVAILABLE) ?: false
                 val sensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION) ?: 0
+                
+                // Get sensor size and megapixels
+                val sensorSize = characteristics.get(CameraCharacteristics.SENSOR_INFO_PIXEL_ARRAY_SIZE)
+                val megapixels = if (sensorSize != null) {
+                    val mp = (sensorSize.width * sensorSize.height) / 1000000.0
+                    String.format("%.1f MP", mp)
+                } else {
+                    "N/A"
+                }
+                
+                val imageSize = if (sensorSize != null) {
+                    "${sensorSize.width} x ${sensorSize.height}"
+                } else {
+                    "N/A"
+                }
+                
+                // Get focal length
+                val focalLengths = characteristics.get(CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS)
+                val focalLength = if (focalLengths != null && focalLengths.isNotEmpty()) {
+                    "${focalLengths[0]} mm"
+                } else {
+                    "N/A"
+                }
+                
+                // Get aperture
+                val apertures = characteristics.get(CameraCharacteristics.LENS_INFO_AVAILABLE_APERTURES)
+                val aperture = if (apertures != null && apertures.isNotEmpty()) {
+                    "f/${apertures[0]}"
+                } else {
+                    "N/A"
+                }
+                
+                // Get optical stabilization
+                val opticalStabilization = characteristics.get(CameraCharacteristics.LENS_INFO_AVAILABLE_OPTICAL_STABILIZATION)
+                    ?.contains(CameraCharacteristics.LENS_OPTICAL_STABILIZATION_MODE_ON) ?: false
+                
+                // Get auto-exposure and auto-white balance lock support
+                val autoExposureLock = characteristics.get(CameraCharacteristics.CONTROL_AE_LOCK_AVAILABLE) ?: false
+                val autoWhiteBalanceLock = characteristics.get(CameraCharacteristics.CONTROL_AWB_LOCK_AVAILABLE) ?: false
+                
+                // Get supported output formats
+                val streamConfigMap = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
+                val outputFormats = if (streamConfigMap != null) {
+                    val formats = streamConfigMap.outputFormats
+                    formats.joinToString(", ") { format ->
+                        when (format) {
+                            android.graphics.ImageFormat.JPEG -> "JPEG"
+                            android.graphics.ImageFormat.RAW_SENSOR -> "RAW"
+                            android.graphics.ImageFormat.YUV_420_888 -> "YUV"
+                            android.graphics.ImageFormat.PRIVATE -> "PRIVATE"
+                            else -> "Format $format"
+                        }
+                    }.take(50) + if (formats.size > 3) "..." else ""
+                } else {
+                    "N/A"
+                }
 
                 CameraDetail(
                     cameraId = id,
                     facing = facingString,
                     flashAvailable = flashAvailable,
-                    sensorOrientation = sensorOrientation
+                    sensorOrientation = sensorOrientation,
+                    megapixels = megapixels,
+                    focalLength = focalLength,
+                    aperture = aperture,
+                    opticalStabilization = opticalStabilization,
+                    autoExposureLock = autoExposureLock,
+                    autoWhiteBalanceLock = autoWhiteBalanceLock,
+                    outputFormats = outputFormats,
+                    imageSize = imageSize
                 )
             } catch (e: Exception) {
                 null
@@ -421,8 +485,8 @@ class DeviceInfoRepository(private val context: Context) {
             val line1 = reader1.readLine()
             reader1.close()
             
-            // Wait 100ms for measurement
-            Thread.sleep(100)
+            // Wait 200ms for better measurement accuracy
+            Thread.sleep(200)
             
             // Read second CPU stats
             val reader2 = BufferedReader(FileReader("/proc/stat"))
@@ -445,6 +509,37 @@ class DeviceInfoRepository(private val context: Context) {
             val nice2 = tokens2.getOrNull(2)?.toLongOrNull() ?: 0L
             val system2 = tokens2.getOrNull(3)?.toLongOrNull() ?: 0L
             val idle2 = tokens2.getOrNull(4)?.toLongOrNull() ?: 0L
+            val iowait2 = tokens2.getOrNull(5)?.toLongOrNull() ?: 0L
+            val irq2 = tokens2.getOrNull(6)?.toLongOrNull() ?: 0L
+            val softirq2 = tokens2.getOrNull(7)?.toLongOrNull() ?: 0L
+            
+            // Calculate deltas
+            val userDelta = user2 - user1
+            val niceDelta = nice2 - nice1
+            val systemDelta = system2 - system1
+            val idleDelta = idle2 - idle1
+            val iowaitDelta = iowait2 - iowait1
+            val irqDelta = irq2 - irq1
+            val softirqDelta = softirq2 - softirq1
+            
+            // Total CPU time delta
+            val totalDelta = userDelta + niceDelta + systemDelta + idleDelta + iowaitDelta + irqDelta + softirqDelta
+            
+            // Active time (everything except idle)
+            val activeDelta = userDelta + niceDelta + systemDelta + iowaitDelta + irqDelta + softirqDelta
+            
+            // Calculate usage percentage
+            if (totalDelta > 0) {
+                val usage = (activeDelta.toFloat() / totalDelta.toFloat()) * 100f
+                usage.coerceIn(0f, 100f)
+            } else {
+                0f
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            0f
+        }
+    }
             val iowait2 = tokens2.getOrNull(5)?.toLongOrNull() ?: 0L
             val irq2 = tokens2.getOrNull(6)?.toLongOrNull() ?: 0L
             val softirq2 = tokens2.getOrNull(7)?.toLongOrNull() ?: 0L
@@ -500,7 +595,7 @@ class DeviceInfoRepository(private val context: Context) {
     }
 
     private fun benchmarkSingleCore(): Int {
-        val iterations = 1000000
+        val iterations = 2000000 // Increased from 1000000
         var result = 0.0
         val startTime = System.nanoTime()
         
@@ -513,15 +608,15 @@ class DeviceInfoRepository(private val context: Context) {
         val endTime = System.nanoTime()
         val durationMs = (endTime - startTime) / 1000000.0 // Convert to milliseconds
         
-        // Baseline: ~500ms for a good device, scale to 0-1000
+        // Baseline: ~1000ms for a good device with 2M iterations, scale to 0-1000
         // Lower time = higher score
-        val score = (500.0 / durationMs * 1000.0).coerceIn(0.0, 1000.0)
+        val score = (1000.0 / durationMs * 1000.0).coerceIn(0.0, 1000.0)
         return score.toInt()
     }
 
     private fun benchmarkMultiCore(): Int {
         val cores = Runtime.getRuntime().availableProcessors()
-        val iterations = 500000
+        val iterations = 1000000 // Increased from 500000
         val startTime = System.nanoTime()
         
         val threads = (0 until cores).map {
@@ -554,8 +649,8 @@ class DeviceInfoRepository(private val context: Context) {
         val array = IntArray(arraySize) { it }
         var sum = 0L
         
-        // Multiple passes to test memory bandwidth
-        repeat(3) {
+        // Multiple passes to test memory bandwidth - increased to 5 passes
+        repeat(5) {
             for (i in 0 until arraySize) {
                 sum += array[i]
             }
@@ -564,9 +659,9 @@ class DeviceInfoRepository(private val context: Context) {
         val endTime = System.nanoTime()
         val durationMs = (endTime - startTime) / 1000000.0
         
-        // Baseline: ~100ms for good memory, scale to 0-1000
+        // Baseline: ~150ms for good memory with 5 passes, scale to 0-1000
         // Lower time = higher score
-        val score = (100.0 / durationMs * 1000.0).coerceIn(0.0, 1000.0)
+        val score = (150.0 / durationMs * 1000.0).coerceIn(0.0, 1000.0)
         return score.toInt()
     }
 }

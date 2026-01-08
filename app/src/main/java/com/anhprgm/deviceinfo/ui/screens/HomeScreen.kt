@@ -34,7 +34,8 @@ fun HomeScreen(
     onNavigateToHistory: () -> Unit,
     onNavigateToAppManager: () -> Unit,
     onNavigateToMonitoring: () -> Unit,
-    onNavigateToBenchmark: () -> Unit
+    onNavigateToBenchmark: () -> Unit,
+    onNavigateToSettings: () -> Unit
 ) {
     val deviceInfo by viewModel.deviceInfo.collectAsState()
     val hardwareInfo by viewModel.hardwareInfo.collectAsState()
@@ -47,22 +48,18 @@ fun HomeScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { 
-                    Column {
-                        Text(
-                            "DevInfo",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            "Device Information App",
-                            style = MaterialTheme.typography.bodySmall
+                title = { Text("") },
+                actions = {
+                    IconButton(onClick = onNavigateToSettings) {
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = "Settings",
+                            tint = MaterialTheme.colorScheme.primary
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                    containerColor = MaterialTheme.colorScheme.surface
                 )
             )
         }
@@ -139,12 +136,16 @@ fun HomeScreen(
                     }
                 }
 
+                Spacer(modifier = Modifier.height(8.dp))
+                
                 // Basic Information Section
                 SectionHeader(
                     icon = Icons.Default.Inventory,
                     title = "Device Information",
                     subtitle = "View detailed hardware and system specs"
                 )
+                
+                Spacer(modifier = Modifier.height(4.dp))
                 
                 deviceInfo?.let { device ->
                     QuickInfoCard(
@@ -209,12 +210,16 @@ fun HomeScreen(
                     )
                 }
 
+                Spacer(modifier = Modifier.height(16.dp))
+                
                 // Advanced Features Section
                 SectionHeader(
                     icon = Icons.Default.AutoAwesome,
                     title = "Advanced Features",
                     subtitle = "Monitor, analyze, and manage your device"
                 )
+                
+                Spacer(modifier = Modifier.height(4.dp))
 
                 QuickInfoCard(
                     icon = Icons.Default.History,
