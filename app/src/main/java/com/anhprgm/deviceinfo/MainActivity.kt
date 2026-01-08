@@ -130,6 +130,7 @@ fun DevInfoApp() {
             selectedApp?.let { app ->
                 AppDetailScreen(
                     appInfo = app,
+                    viewModel = viewModel,
                     onNavigateBack = { navController.popBackStack() }
                 )
             }

@@ -25,6 +25,7 @@ import androidx.core.graphics.drawable.toBitmap
 import com.anhprgm.deviceinfo.data.models.AppInfo
 import com.anhprgm.deviceinfo.ui.components.DetailRow
 import com.anhprgm.deviceinfo.ui.components.InfoCard
+import com.anhprgm.deviceinfo.ui.viewmodel.DeviceInfoViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -32,20 +33,16 @@ import kotlinx.coroutines.withContext
 @Composable
 fun AppDetailScreen(
     appInfo: AppInfo,
+    viewModel: DeviceInfoViewModel,
     onNavigateBack: () -> Unit
 ) {
-    val context = LocalContext.current
     var appIcon by remember { mutableStateOf(appInfo.icon) }
     
-    // Load icon on demand if not available
+    // Load icon on demand if not available using repository
     LaunchedEffect(appInfo.packageName) {
         if (appIcon == null) {
             withContext(Dispatchers.IO) {
-                try {
-                    context.packageManager.getApplicationIcon(appInfo.packageName)
-                } catch (e: Exception) {
-                    null
-                }
+                viewModel.getAppIcon(appInfo.packageName)
             }?.let { icon ->
                 appIcon = icon
             }
