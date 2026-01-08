@@ -257,9 +257,20 @@ class DeviceInfoRepository(private val context: Context) {
     private fun getCpuInfo(): String {
         return try {
             val reader = BufferedReader(FileReader("/proc/cpuinfo"))
-            val line = reader.readLine()
+            var cpuModel = Build.HARDWARE
+            var line: String?
+            
+            // Read through cpuinfo to find processor model
+            while (reader.readLine().also { line = it } != null) {
+                if (line?.startsWith("model name") == true || 
+                    line?.startsWith("Processor") == true ||
+                    line?.startsWith("Hardware") == true) {
+                    cpuModel = line?.substringAfter(":")?.trim() ?: Build.HARDWARE
+                    break
+                }
+            }
             reader.close()
-            line?.substringAfter(":")?.trim() ?: Build.HARDWARE
+            cpuModel
         } catch (e: Exception) {
             Build.HARDWARE
         }
@@ -399,23 +410,58 @@ class DeviceInfoRepository(private val context: Context) {
 
     private fun getCpuUsage(): Float {
         return try {
-            val reader = BufferedReader(FileReader("/proc/stat"))
-            val line = reader.readLine()
-            reader.close()
+            // Read initial CPU stats
+            val reader1 = BufferedReader(FileReader("/proc/stat"))
+            val line1 = reader1.readLine()
+            reader1.close()
             
-            val tokens = line.split("\\s+".toRegex())
-            if (tokens.size >= 5) {
-                val user = tokens[1].toLongOrNull() ?: 0
-                val nice = tokens[2].toLongOrNull() ?: 0
-                val system = tokens[3].toLongOrNull() ?: 0
-                val idle = tokens[4].toLongOrNull() ?: 0
-                val total = user + nice + system + idle
-                val usage = if (total > 0) ((user + nice + system).toFloat() / total.toFloat()) * 100f else 0f
-                usage
+            // Wait 100ms for measurement
+            Thread.sleep(100)
+            
+            // Read second CPU stats
+            val reader2 = BufferedReader(FileReader("/proc/stat"))
+            val line2 = reader2.readLine()
+            reader2.close()
+            
+            // Parse first measurement
+            val tokens1 = line1.split("\\s+".toRegex())
+            val user1 = tokens1.getOrNull(1)?.toLongOrNull() ?: 0L
+            val nice1 = tokens1.getOrNull(2)?.toLongOrNull() ?: 0L
+            val system1 = tokens1.getOrNull(3)?.toLongOrNull() ?: 0L
+            val idle1 = tokens1.getOrNull(4)?.toLongOrNull() ?: 0L
+            val iowait1 = tokens1.getOrNull(5)?.toLongOrNull() ?: 0L
+            val irq1 = tokens1.getOrNull(6)?.toLongOrNull() ?: 0L
+            val softirq1 = tokens1.getOrNull(7)?.toLongOrNull() ?: 0L
+            
+            // Parse second measurement
+            val tokens2 = line2.split("\\s+".toRegex())
+            val user2 = tokens2.getOrNull(1)?.toLongOrNull() ?: 0L
+            val nice2 = tokens2.getOrNull(2)?.toLongOrNull() ?: 0L
+            val system2 = tokens2.getOrNull(3)?.toLongOrNull() ?: 0L
+            val idle2 = tokens2.getOrNull(4)?.toLongOrNull() ?: 0L
+            val iowait2 = tokens2.getOrNull(5)?.toLongOrNull() ?: 0L
+            val irq2 = tokens2.getOrNull(6)?.toLongOrNull() ?: 0L
+            val softirq2 = tokens2.getOrNull(7)?.toLongOrNull() ?: 0L
+            
+            // Calculate deltas
+            val userDelta = user2 - user1
+            val niceDelta = nice2 - nice1
+            val systemDelta = system2 - system1
+            val idleDelta = idle2 - idle1
+            val iowaitDelta = iowait2 - iowait1
+            val irqDelta = irq2 - irq1
+            val softirqDelta = softirq2 - softirq1
+            
+            val activeTime = userDelta + niceDelta + systemDelta + irqDelta + softirqDelta
+            val totalTime = activeTime + idleDelta + iowaitDelta
+            
+            if (totalTime > 0) {
+                (activeTime.toFloat() / totalTime.toFloat() * 100f).coerceIn(0f, 100f)
             } else {
                 0f
             }
         } catch (e: Exception) {
+            e.printStackTrace()
             0f
         }
     }
@@ -452,15 +498,19 @@ class DeviceInfoRepository(private val context: Context) {
         var result = 0.0
         val startTime = System.nanoTime()
         
+        // Perform mathematical operations
         for (i in 0 until iterations) {
-            result += kotlin.math.sqrt(i.toDouble())
+            result += sqrt(i.toDouble())
+            result += i.toDouble().pow(0.5)
         }
         
         val endTime = System.nanoTime()
-        val duration = (endTime - startTime) / 1000000.0 // Convert to milliseconds
+        val durationMs = (endTime - startTime) / 1000000.0 // Convert to milliseconds
         
-        // Score inversely proportional to time taken (lower time = higher score)
-        return (10000.0 / duration).toInt().coerceIn(0, 1000)
+        // Baseline: ~500ms for a good device, scale to 0-1000
+        // Lower time = higher score
+        val score = (500.0 / durationMs * 1000.0).coerceIn(0.0, 1000.0)
+        return score.toInt()
     }
 
     private fun benchmarkMultiCore(): Int {
@@ -472,7 +522,8 @@ class DeviceInfoRepository(private val context: Context) {
             Thread {
                 var result = 0.0
                 for (i in 0 until iterations) {
-                    result += kotlin.math.sqrt(i.toDouble())
+                    result += sqrt(i.toDouble())
+                    result += i.toDouble().pow(0.5)
                 }
             }
         }
@@ -481,24 +532,35 @@ class DeviceInfoRepository(private val context: Context) {
         threads.forEach { it.join() }
         
         val endTime = System.nanoTime()
-        val duration = (endTime - startTime) / 1000000.0
+        val durationMs = (endTime - startTime) / 1000000.0
         
-        return (20000.0 / duration).toInt().coerceIn(0, 1000)
+        // Baseline: ~300ms for a good multi-core device, scale to 0-1000
+        // Lower time = higher score
+        val score = (300.0 / durationMs * 1000.0).coerceIn(0.0, 1000.0)
+        return score.toInt()
     }
 
     private fun benchmarkMemory(): Int {
         val arraySize = 1000000
         val startTime = System.nanoTime()
         
+        // Memory allocation and access test
         val array = IntArray(arraySize) { it }
         var sum = 0L
-        for (i in 0 until arraySize) {
-            sum += array[i]
+        
+        // Multiple passes to test memory bandwidth
+        repeat(3) {
+            for (i in 0 until arraySize) {
+                sum += array[i]
+            }
         }
         
         val endTime = System.nanoTime()
-        val duration = (endTime - startTime) / 1000000.0
+        val durationMs = (endTime - startTime) / 1000000.0
         
-        return (5000.0 / duration).toInt().coerceIn(0, 1000)
+        // Baseline: ~100ms for good memory, scale to 0-1000
+        // Lower time = higher score
+        val score = (100.0 / durationMs * 1000.0).coerceIn(0.0, 1000.0)
+        return score.toInt()
     }
 }
