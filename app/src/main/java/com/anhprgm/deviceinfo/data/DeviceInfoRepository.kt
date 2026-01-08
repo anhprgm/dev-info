@@ -350,6 +350,11 @@ class DeviceInfoRepository(private val context: Context) {
                 if (isSystemApp) systemAppsCount++ else userAppsCount++
                 
                 val permissions = packageInfo.requestedPermissions?.toList() ?: emptyList()
+                val icon = try {
+                    packageManager.getApplicationIcon(packageInfo.packageName)
+                } catch (e: Exception) {
+                    null
+                }
                 
                 AppInfo(
                     appName = packageManager.getApplicationLabel(appInfo).toString(),
@@ -358,7 +363,8 @@ class DeviceInfoRepository(private val context: Context) {
                     size = "N/A", // Size calculation requires additional permissions
                     installTime = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
                         .format(java.util.Date(packageInfo.firstInstallTime)),
-                    permissions = permissions.take(5) // Show first 5 permissions
+                    permissions = permissions.take(5), // Show first 5 permissions
+                    icon = icon
                 )
             } catch (e: Exception) {
                 null

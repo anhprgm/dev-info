@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
@@ -117,8 +118,21 @@ fun DevInfoApp() {
         composable("appmanager") {
             AppManagerScreen(
                 viewModel = viewModel,
-                onNavigateBack = { navController.popBackStack() }
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToAppDetail = { appInfo ->
+                    viewModel.selectApp(appInfo)
+                    navController.navigate("appdetail")
+                }
             )
+        }
+        composable("appdetail") {
+            val selectedApp = viewModel.selectedApp.collectAsState().value
+            selectedApp?.let { app ->
+                AppDetailScreen(
+                    appInfo = app,
+                    onNavigateBack = { navController.popBackStack() }
+                )
+            }
         }
         composable("monitoring") {
             MonitoringScreen(

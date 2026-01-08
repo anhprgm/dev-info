@@ -51,6 +51,9 @@ class DeviceInfoViewModel(
     private val _isRunningBenchmark = MutableStateFlow(false)
     val isRunningBenchmark: StateFlow<Boolean> = _isRunningBenchmark.asStateFlow()
 
+    private val _selectedApp = MutableStateFlow<AppInfo?>(null)
+    val selectedApp: StateFlow<AppInfo?> = _selectedApp.asStateFlow()
+
     init {
         loadAllInfo()
     }
@@ -143,5 +146,9 @@ class DeviceInfoViewModel(
             historyDatabase.clearHistory()
             _historyInfo.value = historyDatabase.getHistoryData()
         }
+    }
+
+    fun selectApp(appInfo: AppInfo) {
+        _selectedApp.value = appInfo
     }
 }
