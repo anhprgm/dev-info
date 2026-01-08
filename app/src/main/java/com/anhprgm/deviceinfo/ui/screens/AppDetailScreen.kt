@@ -9,11 +9,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
@@ -24,6 +25,8 @@ import androidx.core.graphics.drawable.toBitmap
 import com.anhprgm.deviceinfo.data.models.AppInfo
 import com.anhprgm.deviceinfo.ui.components.DetailRow
 import com.anhprgm.deviceinfo.ui.components.InfoCard
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,6 +35,22 @@ fun AppDetailScreen(
     onNavigateBack: () -> Unit
 ) {
     val context = LocalContext.current
+    var appIcon by remember { mutableStateOf(appInfo.icon) }
+    
+    // Load icon on demand if not available
+    LaunchedEffect(appInfo.packageName) {
+        if (appIcon == null) {
+            withContext(Dispatchers.IO) {
+                try {
+                    context.packageManager.getApplicationIcon(appInfo.packageName)
+                } catch (e: Exception) {
+                    null
+                }
+            }?.let { icon ->
+                appIcon = icon
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -92,11 +111,21 @@ fun AppDetailScreen(
                         .padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    appInfo.icon?.let { drawable ->
+                    appIcon?.let { drawable ->
                         Image(
                             bitmap = drawable.toBitmap(128, 128).asImageBitmap(),
                             contentDescription = "App Icon",
                             modifier = Modifier.size(96.dp)
+                        )
+                    } ?: Box(
+                        modifier = Modifier.size(96.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Apps,
+                            contentDescription = null,
+                            modifier = Modifier.size(64.dp),
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                     }
                     Spacer(modifier = Modifier.height(16.dp))

@@ -151,4 +151,8 @@ class DeviceInfoViewModel(
     fun selectApp(appInfo: AppInfo) {
         _selectedApp.value = appInfo
     }
+    
+    fun getAppIcon(packageName: String): android.graphics.drawable.Drawable? {
+        return repository.getAppIcon(packageName)
+    }
 }

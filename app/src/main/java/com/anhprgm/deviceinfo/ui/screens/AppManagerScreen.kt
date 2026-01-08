@@ -20,6 +20,8 @@ import com.anhprgm.deviceinfo.ui.components.DetailRow
 import com.anhprgm.deviceinfo.ui.components.InfoCard
 import com.anhprgm.deviceinfo.ui.components.LoadingState
 import com.anhprgm.deviceinfo.ui.viewmodel.DeviceInfoViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 enum class SortOption {
     NAME_ASC, NAME_DESC, INSTALL_DATE_ASC, INSTALL_DATE_DESC, PACKAGE_NAME
@@ -213,89 +215,117 @@ fun AppManagerScreen(
                 }
 
                 items(filteredApps, key = { it.packageName }) { app ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { onNavigateToAppDetail(app) },
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surface
-                        ),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(12.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            // App Icon - Load lazily
-                            app.icon?.let { drawable ->
-                                Image(
-                                    bitmap = drawable.toBitmap(48, 48).asImageBitmap(),
-                                    contentDescription = "App Icon",
-                                    modifier = Modifier.size(40.dp)
-                                )
-                            } ?: Box(
-                                modifier = Modifier.size(40.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Apps,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                            
-                            Spacer(modifier = Modifier.width(12.dp))
-                            
-                            // App Info
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = app.appName,
-                                    style = MaterialTheme.typography.titleSmall,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.primary,
-                                    maxLines = 1
-                                )
-                                Spacer(modifier = Modifier.height(2.dp))
-                                
-                                Text(
-                                    text = app.packageName,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    maxLines = 1
-                                )
-                                Spacer(modifier = Modifier.height(2.dp))
-                                
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Text(
-                                        text = "v${app.versionName}",
-                                        style = MaterialTheme.typography.bodySmall
-                                    )
-                                    if (app.permissions.isNotEmpty()) {
-                                        Text(
-                                            text = "${app.permissions.size}+ perms",
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.secondary
-                                        )
-                                    }
-                                }
-                            }
-                            
-                            // Arrow indicator
-                            Icon(
-                                imageVector = Icons.Default.ChevronRight,
-                                contentDescription = "View Details",
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
-                    }
+                    AppListItem(
+                        app = app,
+                        viewModel = viewModel,
+                        onClick = { onNavigateToAppDetail(app) }
+                    )
                 }
             }
         } ?: LoadingState(modifier = Modifier.padding(paddingValues))
+    }
+}
+
+@Composable
+private fun AppListItem(
+    app: AppInfo,
+    viewModel: DeviceInfoViewModel,
+    onClick: () -> Unit
+) {
+    var appIcon by remember { mutableStateOf(app.icon) }
+    
+    // Load icon on demand when this item is composed
+    LaunchedEffect(app.packageName) {
+        if (appIcon == null) {
+            withContext(Dispatchers.IO) {
+                viewModel.getAppIcon(app.packageName)
+            }?.let { icon ->
+                appIcon = icon
+            }
+        }
+    }
+    
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // App Icon - Load lazily
+            if (appIcon != null) {
+                Image(
+                    bitmap = appIcon!!.toBitmap(48, 48).asImageBitmap(),
+                    contentDescription = "App Icon",
+                    modifier = Modifier.size(40.dp)
+                )
+            } else {
+                Box(
+                    modifier = Modifier.size(40.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Apps,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+            
+            Spacer(modifier = Modifier.width(12.dp))
+            
+            // App Info
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = app.appName,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                    maxLines = 1
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                
+                Text(
+                    text = app.packageName,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "v${app.versionName}",
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                    if (app.permissions.isNotEmpty()) {
+                        Text(
+                            text = "${app.permissions.size}+ perms",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    }
+                }
+            }
+            
+            // Arrow indicator
+            Icon(
+                imageVector = Icons.Default.ChevronRight,
+                contentDescription = "View Details",
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(20.dp)
+            )
+        }
     }
 }

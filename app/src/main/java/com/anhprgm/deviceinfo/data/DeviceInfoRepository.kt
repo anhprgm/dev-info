@@ -353,7 +353,7 @@ class DeviceInfoRepository(private val context: Context) {
         var systemAppsCount = 0
         var userAppsCount = 0
         
-        // Load app info without icons first for faster initial load
+        // Load app info WITHOUT icons for instant display
         val apps = packages.mapNotNull { packageInfo ->
             try {
                 val appInfo = packageManager.getApplicationInfo(packageInfo.packageName, 0)
@@ -363,13 +363,6 @@ class DeviceInfoRepository(private val context: Context) {
                 
                 val permissions = packageInfo.requestedPermissions?.toList() ?: emptyList()
                 
-                // Load icon lazily - only load when needed
-                val icon = try {
-                    packageManager.getApplicationIcon(packageInfo.packageName)
-                } catch (e: Exception) {
-                    null
-                }
-                
                 AppInfo(
                     appName = packageManager.getApplicationLabel(appInfo).toString(),
                     packageName = packageInfo.packageName,
@@ -377,8 +370,8 @@ class DeviceInfoRepository(private val context: Context) {
                     size = "N/A", // Size calculation requires additional permissions
                     installTime = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
                         .format(java.util.Date(packageInfo.firstInstallTime)),
-                    permissions = permissions, // Show all permissions
-                    icon = icon
+                    permissions = permissions,
+                    icon = null // Don't load icons during initial fetch
                 )
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -392,6 +385,15 @@ class DeviceInfoRepository(private val context: Context) {
             userApps = userAppsCount,
             apps = apps
         )
+    }
+    
+    // New method to load icon for a specific package on demand
+    fun getAppIcon(packageName: String): android.graphics.drawable.Drawable? {
+        return try {
+            context.packageManager.getApplicationIcon(packageName)
+        } catch (e: Exception) {
+            null
+        }
     }
 
     fun getMonitoringInfo(): MonitoringInfo {
