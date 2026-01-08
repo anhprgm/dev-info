@@ -109,13 +109,76 @@ class DeviceInfoRepository(private val context: Context) {
 
         val technology = batteryStatus?.getStringExtra(BatteryManager.EXTRA_TECHNOLOGY) ?: "Unknown"
 
+        // Get battery capacity (design capacity in mAh)
+        val capacity = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            val chargeCounter = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CHARGE_COUNTER)
+            val capacityMicroAh = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
+            
+            // Try to get design capacity
+            val designCapacity = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                try {
+                    // Compute from charge counter (microampere-hours) and level
+                    if (chargeCounter > 0 && batteryPct > 0) {
+                        val estimatedCapacity = (chargeCounter / 1000.0 / batteryPct * 100).toInt()
+                        "$estimatedCapacity mAh"
+                    } else {
+                        "N/A"
+                    }
+                } catch (e: Exception) {
+                    "N/A"
+                }
+            } else {
+                // For older Android versions, estimate from charge counter
+                try {
+                    if (chargeCounter > 0 && batteryPct > 0) {
+                        val estimatedCapacity = (chargeCounter / 1000.0 / batteryPct * 100).toInt()
+                        "$estimatedCapacity mAh"
+                    } else {
+                        "N/A"
+                    }
+                } catch (e: Exception) {
+                    "N/A"
+                }
+            }
+            designCapacity
+        } else {
+            "N/A"
+        }
+
+        // Get charge cycles (only available on some devices via BatteryManager)
+        val chargeCycles = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            try {
+                // Try to read from system files (works on some devices)
+                val cycleCountFile = "/sys/class/power_supply/battery/cycle_count"
+                val cycleCount = try {
+                    BufferedReader(FileReader(cycleCountFile)).use { reader ->
+                        reader.readLine()?.toIntOrNull() ?: -1
+                    }
+                } catch (e: Exception) {
+                    -1
+                }
+                
+                if (cycleCount > 0) {
+                    "$cycleCount cycles"
+                } else {
+                    "N/A"
+                }
+            } catch (e: Exception) {
+                "N/A"
+            }
+        } else {
+            "N/A"
+        }
+
         return BatteryInfo(
             level = batteryPct,
             chargingStatus = chargingStatus,
             temperature = String.format("%.1f°C", tempCelsius),
             voltage = String.format("%.2fV", voltageVolts),
             health = healthStatus,
-            technology = technology
+            technology = technology,
+            capacity = capacity,
+            chargeCycles = chargeCycles
         )
     }
 

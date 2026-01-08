@@ -6,5 +6,7 @@ data class BatteryInfo(
     val temperature: String,
     val voltage: String,
     val health: String,
-    val technology: String
+    val technology: String,
+    val capacity: String,
+    val chargeCycles: String
 )

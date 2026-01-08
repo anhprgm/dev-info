@@ -106,6 +106,10 @@ fun BatteryScreen(
                     DetailRow(label = "Temperature", value = battery.temperature)
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                     DetailRow(label = "Voltage", value = battery.voltage)
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                    DetailRow(label = "Capacity", value = battery.capacity)
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                    DetailRow(label = "Charge Cycles", value = battery.chargeCycles)
                 }
             }
         } ?: LoadingState(modifier = Modifier.padding(paddingValues))
