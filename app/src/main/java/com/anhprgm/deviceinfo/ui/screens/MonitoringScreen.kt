@@ -7,10 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -28,12 +25,20 @@ fun MonitoringScreen(
     onNavigateBack: () -> Unit
 ) {
     val monitoringInfo by viewModel.monitoringInfo.collectAsState()
+    var isActive by remember { mutableStateOf(true) }
 
-    // Auto-refresh every 2 seconds
-    LaunchedEffect(Unit) {
-        while (true) {
+    // Auto-refresh every 2 seconds when screen is active
+    LaunchedEffect(isActive) {
+        while (isActive) {
             viewModel.refreshMonitoringInfo()
             delay(2000)
+        }
+    }
+
+    DisposableEffect(Unit) {
+        isActive = true
+        onDispose {
+            isActive = false
         }
     }
 

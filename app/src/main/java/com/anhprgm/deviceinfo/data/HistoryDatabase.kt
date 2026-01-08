@@ -8,17 +8,27 @@ import java.io.File
 class HistoryDatabase(private val context: Context) {
     private val historyFile = File(context.filesDir, "device_history.txt")
     private val maxEntries = 100 // Keep last 100 entries
+    private var entryCount = -1 // Cache for entry count
 
     fun saveHistoryData(data: HistoryData) {
         try {
             val line = "${data.timestamp},${data.batteryLevel},${data.availableRam},${data.cpuUsage}\n"
             historyFile.appendText(line)
             
-            // Keep only last maxEntries
-            val lines = historyFile.readLines()
-            if (lines.size > maxEntries) {
-                val newLines = lines.takeLast(maxEntries)
-                historyFile.writeText(newLines.joinToString("\n") + "\n")
+            // Increment cached count
+            if (entryCount >= 0) {
+                entryCount++
+            }
+            
+            // Keep only last maxEntries (only check periodically)
+            if (entryCount < 0 || entryCount >= maxEntries + 10) {
+                val lines = historyFile.readLines()
+                entryCount = lines.size
+                if (entryCount > maxEntries) {
+                    val newLines = lines.takeLast(maxEntries)
+                    historyFile.writeText(newLines.joinToString("\n") + "\n")
+                    entryCount = maxEntries
+                }
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -28,6 +38,7 @@ class HistoryDatabase(private val context: Context) {
     fun getHistoryData(): HistoryInfo {
         return try {
             if (!historyFile.exists()) {
+                entryCount = 0
                 return HistoryInfo(emptyList())
             }
             
@@ -49,8 +60,10 @@ class HistoryDatabase(private val context: Context) {
                     }
                 }
             
+            entryCount = history.size
             HistoryInfo(history)
         } catch (e: Exception) {
+            entryCount = 0
             HistoryInfo(emptyList())
         }
     }
@@ -60,6 +73,7 @@ class HistoryDatabase(private val context: Context) {
             if (historyFile.exists()) {
                 historyFile.delete()
             }
+            entryCount = 0
         } catch (e: Exception) {
             e.printStackTrace()
         }

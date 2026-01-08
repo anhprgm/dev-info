@@ -112,10 +112,24 @@ class DeviceInfoViewModel(
             val monitoring = repository.getMonitoringInfo()
             
             if (battery != null) {
+                val hardware = _hardwareInfo.value
+                val availableRamBytes = if (hardware != null) {
+                    // Parse available RAM from string like "3.45 GB"
+                    val ramString = hardware.availableRam
+                    val value = ramString.substringBefore(" ").toFloatOrNull() ?: 0f
+                    if (ramString.contains("GB")) {
+                        (value * 1024 * 1024 * 1024).toLong()
+                    } else {
+                        (value * 1024 * 1024).toLong()
+                    }
+                } else {
+                    0L
+                }
+                
                 val historyData = HistoryData(
                     timestamp = System.currentTimeMillis(),
                     batteryLevel = battery.level,
-                    availableRam = 0L, // Will be updated from monitoring info
+                    availableRam = availableRamBytes,
                     cpuUsage = monitoring.cpuUsage
                 )
                 historyDatabase.saveHistoryData(historyData)

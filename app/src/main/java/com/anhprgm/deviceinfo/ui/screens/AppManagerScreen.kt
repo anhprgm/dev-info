@@ -53,6 +53,8 @@ fun AppManagerScreen(
         }
     ) { paddingValues ->
         appManagerInfo?.let { appManager ->
+            val maxAppsToShow = 50
+            
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -70,7 +72,7 @@ fun AppManagerScreen(
                     }
                 }
 
-                items(appManager.apps.take(50)) { app ->
+                items(appManager.apps.take(maxAppsToShow)) { app ->
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         colors = CardDefaults.cardColors(
@@ -124,10 +126,10 @@ fun AppManagerScreen(
                     }
                 }
 
-                if (appManager.apps.size > 50) {
+                if (appManager.apps.size > maxAppsToShow) {
                     item {
                         Text(
-                            text = "Showing first 50 apps out of ${appManager.apps.size}",
+                            text = "Showing first $maxAppsToShow apps out of ${appManager.apps.size}",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(16.dp)
