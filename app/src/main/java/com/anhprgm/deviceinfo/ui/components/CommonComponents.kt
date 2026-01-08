@@ -103,3 +103,12 @@ fun LoadingState(modifier: Modifier = Modifier) {
         CircularProgressIndicator()
     }
 }
+
+@Composable
+fun HorizontalDivider(modifier: Modifier = Modifier) {
+    Divider(
+        modifier = modifier.fillMaxWidth(),
+        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
+        thickness = 1.dp
+    )
+}
