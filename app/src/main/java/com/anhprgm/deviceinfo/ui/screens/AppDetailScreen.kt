@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Settings
@@ -37,6 +38,7 @@ fun AppDetailScreen(
     onNavigateBack: () -> Unit
 ) {
     var appIcon by remember { mutableStateOf(appInfo.icon) }
+    val context = LocalContext.current
     
     // Load icon on demand if not available using repository
     LaunchedEffect(appInfo.packageName) {
@@ -60,7 +62,7 @@ fun AppDetailScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 actions = {

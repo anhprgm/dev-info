@@ -1,12 +1,47 @@
 package com.anhprgm.deviceinfo.ui.screens
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
+import androidx.compose.material.icons.filled.Apps
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.BatteryChargingFull
+import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.DeviceUnknown
+import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Inventory
+import androidx.compose.material.icons.filled.Memory
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Screenshot
+import androidx.compose.material.icons.filled.Sensors
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Speed
+import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material.icons.filled.Wifi
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -15,8 +50,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.anhprgm.deviceinfo.ui.components.InfoCard
-import com.anhprgm.deviceinfo.ui.components.InfoRow
 import com.anhprgm.deviceinfo.ui.components.LoadingState
 import com.anhprgm.deviceinfo.ui.viewmodel.DeviceInfoViewModel
 
@@ -118,7 +151,7 @@ fun HomeScreen(
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
                             QuickStatItem(
-                                icon = Icons.Default.Phone,
+                                icon = Icons.Default.DeviceUnknown,
                                 label = "Device",
                                 value = deviceInfo?.manufacturer ?: "Unknown"
                             )
@@ -149,7 +182,7 @@ fun HomeScreen(
                 
                 deviceInfo?.let { device ->
                     QuickInfoCard(
-                        icon = Icons.Default.Phone,
+                        icon = Icons.Default.DeviceUnknown,
                         title = "Device",
                         subtitle = "${device.manufacturer} ${device.model}",
                         onClick = onNavigateToDevice
