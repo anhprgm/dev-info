@@ -110,7 +110,7 @@ fun SettingsScreen(
                         title = "Privacy Policy",
                         subtitle = "Learn how we handle your data",
                         onClick = {
-                            // Open privacy policy URL
+                            // TODO: Replace with actual privacy policy URL before production release
                             val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://example.com/privacy"))
                             context.startActivity(intent)
                         }
@@ -123,7 +123,7 @@ fun SettingsScreen(
                         title = "Terms of Service",
                         subtitle = "Read our terms and conditions",
                         onClick = {
-                            // Open terms of service URL
+                            // TODO: Replace with actual terms of service URL before production release
                             val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://example.com/terms"))
                             context.startActivity(intent)
                         }
@@ -184,7 +184,7 @@ fun SettingsScreen(
                         title = "Send Feedback",
                         subtitle = "Help us improve the app",
                         onClick = {
-                            // Open email for feedback
+                            // TODO: Replace with actual support email before production release
                             val intent = Intent(Intent.ACTION_SENDTO).apply {
                                 data = Uri.parse("mailto:feedback@example.com")
                                 putExtra(Intent.EXTRA_SUBJECT, "DevInfo Feedback")

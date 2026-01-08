@@ -270,7 +270,8 @@ class DeviceInfoRepository(private val context: Context) {
                 val streamConfigMap = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
                 val outputFormats = if (streamConfigMap != null) {
                     val formats = streamConfigMap.outputFormats
-                    formats.joinToString(", ") { format ->
+                    val originalSize = formats.size
+                    val formatsString = formats.joinToString(", ") { format ->
                         when (format) {
                             android.graphics.ImageFormat.JPEG -> "JPEG"
                             android.graphics.ImageFormat.RAW_SENSOR -> "RAW"
@@ -278,7 +279,8 @@ class DeviceInfoRepository(private val context: Context) {
                             android.graphics.ImageFormat.PRIVATE -> "PRIVATE"
                             else -> "Format $format"
                         }
-                    }.take(50) + if (formats.size > 3) "..." else ""
+                    }.take(50) + if (originalSize > 3) "..." else ""
+                    formatsString
                 } else {
                     "N/A"
                 }
@@ -532,32 +534,6 @@ class DeviceInfoRepository(private val context: Context) {
             if (totalDelta > 0) {
                 val usage = (activeDelta.toFloat() / totalDelta.toFloat()) * 100f
                 usage.coerceIn(0f, 100f)
-            } else {
-                0f
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            0f
-        }
-    }
-            val iowait2 = tokens2.getOrNull(5)?.toLongOrNull() ?: 0L
-            val irq2 = tokens2.getOrNull(6)?.toLongOrNull() ?: 0L
-            val softirq2 = tokens2.getOrNull(7)?.toLongOrNull() ?: 0L
-            
-            // Calculate deltas
-            val userDelta = user2 - user1
-            val niceDelta = nice2 - nice1
-            val systemDelta = system2 - system1
-            val idleDelta = idle2 - idle1
-            val iowaitDelta = iowait2 - iowait1
-            val irqDelta = irq2 - irq1
-            val softirqDelta = softirq2 - softirq1
-            
-            val activeTime = userDelta + niceDelta + systemDelta + irqDelta + softirqDelta
-            val totalTime = activeTime + idleDelta + iowaitDelta
-            
-            if (totalTime > 0) {
-                (activeTime.toFloat() / totalTime.toFloat() * 100f).coerceIn(0f, 100f)
             } else {
                 0f
             }
