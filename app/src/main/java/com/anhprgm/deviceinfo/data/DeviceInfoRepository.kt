@@ -294,4 +294,205 @@ class DeviceInfoRepository(private val context: Context) {
             else -> "ldpi"
         }
     }
+
+    fun getSensorInfo(): SensorInfo {
+        val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as android.hardware.SensorManager
+        val sensorList = sensorManager.getSensorList(android.hardware.Sensor.TYPE_ALL)
+        
+        val sensors = sensorList.map { sensor ->
+            SensorDetail(
+                name = sensor.name,
+                type = getSensorTypeName(sensor.type),
+                vendor = sensor.vendor,
+                power = String.format("%.2f mA", sensor.power),
+                maxRange = String.format("%.2f", sensor.maximumRange),
+                resolution = String.format("%.4f", sensor.resolution)
+            )
+        }
+        
+        return SensorInfo(
+            sensorCount = sensors.size,
+            sensors = sensors
+        )
+    }
+
+    private fun getSensorTypeName(type: Int): String {
+        return when (type) {
+            android.hardware.Sensor.TYPE_ACCELEROMETER -> "Accelerometer"
+            android.hardware.Sensor.TYPE_GYROSCOPE -> "Gyroscope"
+            android.hardware.Sensor.TYPE_LIGHT -> "Light"
+            android.hardware.Sensor.TYPE_PROXIMITY -> "Proximity"
+            android.hardware.Sensor.TYPE_MAGNETIC_FIELD -> "Magnetic Field"
+            android.hardware.Sensor.TYPE_PRESSURE -> "Pressure"
+            android.hardware.Sensor.TYPE_TEMPERATURE -> "Temperature"
+            android.hardware.Sensor.TYPE_GRAVITY -> "Gravity"
+            android.hardware.Sensor.TYPE_LINEAR_ACCELERATION -> "Linear Acceleration"
+            android.hardware.Sensor.TYPE_ROTATION_VECTOR -> "Rotation Vector"
+            android.hardware.Sensor.TYPE_RELATIVE_HUMIDITY -> "Relative Humidity"
+            android.hardware.Sensor.TYPE_AMBIENT_TEMPERATURE -> "Ambient Temperature"
+            else -> "Other (Type: $type)"
+        }
+    }
+
+    @SuppressLint("QueryPermissionsNeeded")
+    fun getAppManagerInfo(): AppManagerInfo {
+        val packageManager = context.packageManager
+        val packages = packageManager.getInstalledPackages(android.content.pm.PackageManager.GET_PERMISSIONS)
+        
+        var systemAppsCount = 0
+        var userAppsCount = 0
+        
+        val apps = packages.mapNotNull { packageInfo ->
+            try {
+                val appInfo = packageManager.getApplicationInfo(packageInfo.packageName, 0)
+                val isSystemApp = (appInfo.flags and android.content.pm.ApplicationInfo.FLAG_SYSTEM) != 0
+                
+                if (isSystemApp) systemAppsCount++ else userAppsCount++
+                
+                val permissions = packageInfo.requestedPermissions?.toList() ?: emptyList()
+                
+                AppInfo(
+                    appName = packageManager.getApplicationLabel(appInfo).toString(),
+                    packageName = packageInfo.packageName,
+                    versionName = packageInfo.versionName ?: "Unknown",
+                    size = "N/A", // Size calculation requires additional permissions
+                    installTime = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+                        .format(java.util.Date(packageInfo.firstInstallTime)),
+                    permissions = permissions.take(5) // Show first 5 permissions
+                )
+            } catch (e: Exception) {
+                null
+            }
+        }.sortedBy { it.appName }
+        
+        return AppManagerInfo(
+            totalApps = packages.size,
+            systemApps = systemAppsCount,
+            userApps = userAppsCount,
+            apps = apps
+        )
+    }
+
+    fun getMonitoringInfo(): MonitoringInfo {
+        val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        val memoryInfo = ActivityManager.MemoryInfo()
+        activityManager.getMemoryInfo(memoryInfo)
+        
+        val cpuUsage = getCpuUsage()
+        val ramUsed = memoryInfo.totalMem - memoryInfo.availMem
+        val ramUsage = (ramUsed.toFloat() / memoryInfo.totalMem.toFloat()) * 100f
+        
+        return MonitoringInfo(
+            cpuUsage = cpuUsage,
+            ramUsage = ramUsage,
+            ramUsed = formatBytes(ramUsed),
+            ramTotal = formatBytes(memoryInfo.totalMem),
+            timestamp = System.currentTimeMillis()
+        )
+    }
+
+    private fun getCpuUsage(): Float {
+        return try {
+            val reader = BufferedReader(FileReader("/proc/stat"))
+            val line = reader.readLine()
+            reader.close()
+            
+            val tokens = line.split("\\s+".toRegex())
+            if (tokens.size >= 5) {
+                val user = tokens[1].toLongOrNull() ?: 0
+                val nice = tokens[2].toLongOrNull() ?: 0
+                val system = tokens[3].toLongOrNull() ?: 0
+                val idle = tokens[4].toLongOrNull() ?: 0
+                val total = user + nice + system + idle
+                val usage = if (total > 0) ((user + nice + system).toFloat() / total.toFloat()) * 100f else 0f
+                usage
+            } else {
+                0f
+            }
+        } catch (e: Exception) {
+            0f
+        }
+    }
+
+    fun runBenchmark(): BenchmarkResult {
+        val startTime = System.currentTimeMillis()
+        
+        // CPU single-core benchmark
+        val singleCoreScore = benchmarkSingleCore()
+        
+        // CPU multi-core benchmark
+        val multiCoreScore = benchmarkMultiCore()
+        
+        // Memory benchmark
+        val memoryScore = benchmarkMemory()
+        
+        val cpuScore = (singleCoreScore + multiCoreScore) / 2
+        val overallScore = (cpuScore + memoryScore) / 2
+        
+        val duration = System.currentTimeMillis() - startTime
+        
+        return BenchmarkResult(
+            cpuScore = cpuScore,
+            singleCoreScore = singleCoreScore,
+            multiCoreScore = multiCoreScore,
+            memoryScore = memoryScore,
+            overallScore = overallScore,
+            duration = duration
+        )
+    }
+
+    private fun benchmarkSingleCore(): Int {
+        val iterations = 1000000
+        var result = 0.0
+        val startTime = System.nanoTime()
+        
+        for (i in 0 until iterations) {
+            result += kotlin.math.sqrt(i.toDouble())
+        }
+        
+        val endTime = System.nanoTime()
+        val duration = (endTime - startTime) / 1000000.0 // Convert to milliseconds
+        
+        // Score inversely proportional to time taken (lower time = higher score)
+        return (10000.0 / duration).toInt().coerceIn(0, 1000)
+    }
+
+    private fun benchmarkMultiCore(): Int {
+        val cores = Runtime.getRuntime().availableProcessors()
+        val iterations = 500000
+        val startTime = System.nanoTime()
+        
+        val threads = (0 until cores).map {
+            Thread {
+                var result = 0.0
+                for (i in 0 until iterations) {
+                    result += kotlin.math.sqrt(i.toDouble())
+                }
+            }
+        }
+        
+        threads.forEach { it.start() }
+        threads.forEach { it.join() }
+        
+        val endTime = System.nanoTime()
+        val duration = (endTime - startTime) / 1000000.0
+        
+        return (20000.0 / duration).toInt().coerceIn(0, 1000)
+    }
+
+    private fun benchmarkMemory(): Int {
+        val arraySize = 1000000
+        val startTime = System.nanoTime()
+        
+        val array = IntArray(arraySize) { it }
+        var sum = 0L
+        for (i in 0 until arraySize) {
+            sum += array[i]
+        }
+        
+        val endTime = System.nanoTime()
+        val duration = (endTime - startTime) / 1000000.0
+        
+        return (5000.0 / duration).toInt().coerceIn(0, 1000)
+    }
 }

@@ -29,7 +29,12 @@ fun HomeScreen(
     onNavigateToBattery: () -> Unit,
     onNavigateToNetwork: () -> Unit,
     onNavigateToDisplay: () -> Unit,
-    onNavigateToCamera: () -> Unit
+    onNavigateToCamera: () -> Unit,
+    onNavigateToSensor: () -> Unit,
+    onNavigateToHistory: () -> Unit,
+    onNavigateToAppManager: () -> Unit,
+    onNavigateToMonitoring: () -> Unit,
+    onNavigateToBenchmark: () -> Unit
 ) {
     val deviceInfo by viewModel.deviceInfo.collectAsState()
     val hardwareInfo by viewModel.hardwareInfo.collectAsState()
@@ -37,6 +42,7 @@ fun HomeScreen(
     val networkInfo by viewModel.networkInfo.collectAsState()
     val displayInfo by viewModel.displayInfo.collectAsState()
     val cameraInfo by viewModel.cameraInfo.collectAsState()
+    val sensorInfo by viewModel.sensorInfo.collectAsState()
 
     Scaffold(
         topBar = {
@@ -72,7 +78,15 @@ fun HomeScreen(
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Quick Summary Cards
+                // Basic Information Section
+                Text(
+                    "Basic Information",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+                
                 deviceInfo?.let { device ->
                     QuickInfoCard(
                         icon = Icons.Default.Phone,
@@ -126,6 +140,52 @@ fun HomeScreen(
                         onClick = onNavigateToCamera
                     )
                 }
+
+                sensorInfo?.let { sensor ->
+                    QuickInfoCard(
+                        icon = Icons.Default.Sensors,
+                        title = "Sensors",
+                        subtitle = "${sensor.sensorCount} Sensor(s)",
+                        onClick = onNavigateToSensor
+                    )
+                }
+
+                // Advanced Features Section
+                Text(
+                    "Advanced Features",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
+                )
+
+                QuickInfoCard(
+                    icon = Icons.Default.History,
+                    title = "History Tracking",
+                    subtitle = "Battery & CPU usage over time",
+                    onClick = onNavigateToHistory
+                )
+
+                QuickInfoCard(
+                    icon = Icons.Default.Apps,
+                    title = "App Manager",
+                    subtitle = "View installed applications",
+                    onClick = onNavigateToAppManager
+                )
+
+                QuickInfoCard(
+                    icon = Icons.Default.Speed,
+                    title = "Real-time Monitoring",
+                    subtitle = "Live CPU & RAM monitoring",
+                    onClick = onNavigateToMonitoring
+                )
+
+                QuickInfoCard(
+                    icon = Icons.Default.Timer,
+                    title = "Benchmark Tests",
+                    subtitle = "Test device performance",
+                    onClick = onNavigateToBenchmark
+                )
             }
         }
     }

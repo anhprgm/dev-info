@@ -13,6 +13,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.anhprgm.deviceinfo.data.DeviceInfoRepository
+import com.anhprgm.deviceinfo.data.HistoryDatabase
 import com.anhprgm.deviceinfo.ui.screens.*
 import com.anhprgm.deviceinfo.ui.theme.DevInfoTheme
 import com.anhprgm.deviceinfo.ui.viewmodel.DeviceInfoViewModel
@@ -36,12 +37,14 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun DevInfoApp() {
     val navController = rememberNavController()
-    val repository = DeviceInfoRepository(androidx.compose.ui.platform.LocalContext.current)
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val repository = DeviceInfoRepository(context)
+    val historyDatabase = HistoryDatabase(context)
     val viewModel: DeviceInfoViewModel = viewModel(
         factory = object : androidx.lifecycle.ViewModelProvider.Factory {
             override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
                 @Suppress("UNCHECKED_CAST")
-                return DeviceInfoViewModel(repository) as T
+                return DeviceInfoViewModel(repository, historyDatabase) as T
             }
         }
     )
@@ -55,7 +58,12 @@ fun DevInfoApp() {
                 onNavigateToBattery = { navController.navigate("battery") },
                 onNavigateToNetwork = { navController.navigate("network") },
                 onNavigateToDisplay = { navController.navigate("display") },
-                onNavigateToCamera = { navController.navigate("camera") }
+                onNavigateToCamera = { navController.navigate("camera") },
+                onNavigateToSensor = { navController.navigate("sensor") },
+                onNavigateToHistory = { navController.navigate("history") },
+                onNavigateToAppManager = { navController.navigate("appmanager") },
+                onNavigateToMonitoring = { navController.navigate("monitoring") },
+                onNavigateToBenchmark = { navController.navigate("benchmark") }
             )
         }
         composable("device") {
@@ -90,6 +98,36 @@ fun DevInfoApp() {
         }
         composable("camera") {
             CameraScreen(
+                viewModel = viewModel,
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+        composable("sensor") {
+            SensorScreen(
+                viewModel = viewModel,
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+        composable("history") {
+            HistoryScreen(
+                viewModel = viewModel,
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+        composable("appmanager") {
+            AppManagerScreen(
+                viewModel = viewModel,
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+        composable("monitoring") {
+            MonitoringScreen(
+                viewModel = viewModel,
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+        composable("benchmark") {
+            BenchmarkScreen(
                 viewModel = viewModel,
                 onNavigateBack = { navController.popBackStack() }
             )

@@ -3,13 +3,17 @@ package com.anhprgm.deviceinfo.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.anhprgm.deviceinfo.data.DeviceInfoRepository
+import com.anhprgm.deviceinfo.data.HistoryDatabase
 import com.anhprgm.deviceinfo.data.models.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class DeviceInfoViewModel(private val repository: DeviceInfoRepository) : ViewModel() {
+class DeviceInfoViewModel(
+    private val repository: DeviceInfoRepository,
+    private val historyDatabase: HistoryDatabase
+) : ViewModel() {
 
     private val _deviceInfo = MutableStateFlow<DeviceInfo?>(null)
     val deviceInfo: StateFlow<DeviceInfo?> = _deviceInfo.asStateFlow()
@@ -29,6 +33,24 @@ class DeviceInfoViewModel(private val repository: DeviceInfoRepository) : ViewMo
     private val _cameraInfo = MutableStateFlow<CameraInfo?>(null)
     val cameraInfo: StateFlow<CameraInfo?> = _cameraInfo.asStateFlow()
 
+    private val _sensorInfo = MutableStateFlow<SensorInfo?>(null)
+    val sensorInfo: StateFlow<SensorInfo?> = _sensorInfo.asStateFlow()
+
+    private val _historyInfo = MutableStateFlow<HistoryInfo?>(null)
+    val historyInfo: StateFlow<HistoryInfo?> = _historyInfo.asStateFlow()
+
+    private val _appManagerInfo = MutableStateFlow<AppManagerInfo?>(null)
+    val appManagerInfo: StateFlow<AppManagerInfo?> = _appManagerInfo.asStateFlow()
+
+    private val _monitoringInfo = MutableStateFlow<MonitoringInfo?>(null)
+    val monitoringInfo: StateFlow<MonitoringInfo?> = _monitoringInfo.asStateFlow()
+
+    private val _benchmarkResult = MutableStateFlow<BenchmarkResult?>(null)
+    val benchmarkResult: StateFlow<BenchmarkResult?> = _benchmarkResult.asStateFlow()
+
+    private val _isRunningBenchmark = MutableStateFlow(false)
+    val isRunningBenchmark: StateFlow<Boolean> = _isRunningBenchmark.asStateFlow()
+
     init {
         loadAllInfo()
     }
@@ -41,6 +63,8 @@ class DeviceInfoViewModel(private val repository: DeviceInfoRepository) : ViewMo
             _networkInfo.value = repository.getNetworkInfo()
             _displayInfo.value = repository.getDisplayInfo()
             _cameraInfo.value = repository.getCameraInfo()
+            _sensorInfo.value = repository.getSensorInfo()
+            _historyInfo.value = historyDatabase.getHistoryData()
         }
     }
 
@@ -53,6 +77,57 @@ class DeviceInfoViewModel(private val repository: DeviceInfoRepository) : ViewMo
     fun refreshNetworkInfo() {
         viewModelScope.launch {
             _networkInfo.value = repository.getNetworkInfo()
+        }
+    }
+
+    fun refreshSensorInfo() {
+        viewModelScope.launch {
+            _sensorInfo.value = repository.getSensorInfo()
+        }
+    }
+
+    fun loadAppManagerInfo() {
+        viewModelScope.launch {
+            _appManagerInfo.value = repository.getAppManagerInfo()
+        }
+    }
+
+    fun refreshMonitoringInfo() {
+        viewModelScope.launch {
+            _monitoringInfo.value = repository.getMonitoringInfo()
+        }
+    }
+
+    fun runBenchmark() {
+        viewModelScope.launch {
+            _isRunningBenchmark.value = true
+            _benchmarkResult.value = repository.runBenchmark()
+            _isRunningBenchmark.value = false
+        }
+    }
+
+    fun saveHistoryData() {
+        viewModelScope.launch {
+            val battery = _batteryInfo.value
+            val monitoring = repository.getMonitoringInfo()
+            
+            if (battery != null) {
+                val historyData = HistoryData(
+                    timestamp = System.currentTimeMillis(),
+                    batteryLevel = battery.level,
+                    availableRam = 0L, // Will be updated from monitoring info
+                    cpuUsage = monitoring.cpuUsage
+                )
+                historyDatabase.saveHistoryData(historyData)
+                _historyInfo.value = historyDatabase.getHistoryData()
+            }
+        }
+    }
+
+    fun clearHistory() {
+        viewModelScope.launch {
+            historyDatabase.clearHistory()
+            _historyInfo.value = historyDatabase.getHistoryData()
         }
     }
 }

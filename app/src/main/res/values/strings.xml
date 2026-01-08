@@ -9,6 +9,11 @@
     <string name="nav_network">Network</string>
     <string name="nav_display">Display</string>
     <string name="nav_camera">Camera</string>
+    <string name="nav_sensor">Sensors</string>
+    <string name="nav_history">History</string>
+    <string name="nav_appmanager">App Manager</string>
+    <string name="nav_monitoring">Monitoring</string>
+    <string name="nav_benchmark">Benchmark</string>
     
     <!-- Home Screen -->
     <string name="home_title">Device Information</string>
@@ -65,6 +70,50 @@
     <string name="facing">Facing</string>
     <string name="flash_available">Flash Available</string>
     <string name="sensor_orientation">Sensor Orientation</string>
+    
+    <!-- Sensor Screen -->
+    <string name="sensor_title">Sensor Information</string>
+    <string name="sensor_count">Sensor Count</string>
+    <string name="sensor_name">Sensor Name</string>
+    <string name="sensor_type">Type</string>
+    <string name="sensor_vendor">Vendor</string>
+    <string name="sensor_power">Power Consumption</string>
+    <string name="sensor_range">Max Range</string>
+    <string name="sensor_resolution">Resolution</string>
+    
+    <!-- History Screen -->
+    <string name="history_title">History Tracking</string>
+    <string name="history_battery">Battery History</string>
+    <string name="history_cpu">CPU History</string>
+    <string name="history_clear">Clear History</string>
+    
+    <!-- App Manager Screen -->
+    <string name="appmanager_title">App Manager</string>
+    <string name="appmanager_total">Total Apps</string>
+    <string name="appmanager_user">User Apps</string>
+    <string name="appmanager_system">System Apps</string>
+    <string name="appmanager_package">Package Name</string>
+    <string name="appmanager_version">Version</string>
+    <string name="appmanager_installed">Installed</string>
+    <string name="appmanager_permissions">Permissions</string>
+    
+    <!-- Monitoring Screen -->
+    <string name="monitoring_title">Real-time Monitoring</string>
+    <string name="monitoring_cpu">CPU Usage</string>
+    <string name="monitoring_ram">RAM Usage</string>
+    <string name="monitoring_used">Used</string>
+    <string name="monitoring_total">Total</string>
+    
+    <!-- Benchmark Screen -->
+    <string name="benchmark_title">Benchmark Tests</string>
+    <string name="benchmark_start">Start Benchmark</string>
+    <string name="benchmark_running">Running benchmark...</string>
+    <string name="benchmark_overall">Overall Score</string>
+    <string name="benchmark_cpu">CPU Score</string>
+    <string name="benchmark_singlecore">Single-Core</string>
+    <string name="benchmark_multicore">Multi-Core</string>
+    <string name="benchmark_memory">Memory Score</string>
+    <string name="benchmark_duration">Duration</string>
     
     <!-- Common -->
     <string name="unknown">Unknown</string>
