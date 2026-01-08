@@ -5,10 +5,12 @@ import androidx.lifecycle.viewModelScope
 import com.anhprgm.deviceinfo.data.DeviceInfoRepository
 import com.anhprgm.deviceinfo.data.HistoryDatabase
 import com.anhprgm.deviceinfo.data.models.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class DeviceInfoViewModel(
     private val repository: DeviceInfoRepository,
@@ -104,7 +106,11 @@ class DeviceInfoViewModel(
     fun runBenchmark() {
         viewModelScope.launch {
             _isRunningBenchmark.value = true
-            _benchmarkResult.value = repository.runBenchmark()
+            // Run benchmark on Default dispatcher to avoid blocking UI
+            val result = withContext(Dispatchers.Default) {
+                repository.runBenchmark()
+            }
+            _benchmarkResult.value = result
             _isRunningBenchmark.value = false
         }
     }
