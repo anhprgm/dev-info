@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -16,6 +17,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,7 +37,7 @@ fun SettingsScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -55,39 +57,39 @@ fun SettingsScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // App Info Section
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Text(
-                        text = "App Information",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text("Version", style = MaterialTheme.typography.bodyMedium)
-                        Text("1.0.0", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
-                    }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text("Developer", style = MaterialTheme.typography.bodyMedium)
-                        Text("anhprgm", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
-                    }
-                }
-            }
+//            Card(
+//                modifier = Modifier.fillMaxWidth(),
+//                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+//            ) {
+//                Column(
+//                    modifier = Modifier.padding(16.dp)
+//                ) {
+//                    Text(
+//                        text = "App Information",
+//                        style = MaterialTheme.typography.titleMedium,
+//                        fontWeight = FontWeight.Bold,
+//                        color = MaterialTheme.colorScheme.primary
+//                    )
+//                    Spacer(modifier = Modifier.height(12.dp))
+//
+//                    Row(
+//                        modifier = Modifier.fillMaxWidth(),
+//                        horizontalArrangement = Arrangement.SpaceBetween
+//                    ) {
+//                        Text("Version", style = MaterialTheme.typography.bodyMedium)
+//                        Text("1.0.0", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+//                    }
+//                    Spacer(modifier = Modifier.height(8.dp))
+//
+//                    Row(
+//                        modifier = Modifier.fillMaxWidth(),
+//                        horizontalArrangement = Arrangement.SpaceBetween
+//                    ) {
+//                        Text("Developer", style = MaterialTheme.typography.bodyMedium)
+//                        Text("anhprgm", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+//                    }
+//                }
+//            }
             
             // Legal & Policies Section
             Card(
@@ -116,18 +118,19 @@ fun SettingsScreen(
                         }
                     )
                     
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                    
-                    SettingsItem(
-                        icon = Icons.Default.Description,
-                        title = "Terms of Service",
-                        subtitle = "Read our terms and conditions",
-                        onClick = {
-                            // TODO: Replace with actual terms of service URL before production release
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://example.com/terms"))
-                            context.startActivity(intent)
-                        }
-                    )
+//                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+//
+//                    SettingsItem(
+//                        icon = Icons.Default.Description,
+//                        title = "Terms of Service",
+//                        subtitle = "Read our terms and conditions",
+//                        onClick = {
+//                            // TODO: Replace with actual terms of service URL before production release
+//                            val intent = Intent(Intent.ACTION_VIEW,
+//                                "https://example.com/terms".toUri())
+//                            context.startActivity(intent)
+//                        }
+//                    )
                 }
             }
             
@@ -153,8 +156,8 @@ fun SettingsScreen(
                         subtitle = "Rate DevInfo on Play Store",
                         onClick = {
                             // Open Play Store rating page
-                            val intent = Intent(Intent.ACTION_VIEW, 
-                                Uri.parse("https://play.google.com/store/apps/details?id=${context.packageName}"))
+                            val intent = Intent(Intent.ACTION_VIEW,
+                                "https://play.google.com/store/apps/details?id=${context.packageName}".toUri())
                             context.startActivity(intent)
                         }
                     )
