@@ -112,8 +112,8 @@ fun SettingsScreen(
                         title = "Privacy Policy",
                         subtitle = "Learn how we handle your data",
                         onClick = {
-                            // TODO: Replace with actual privacy policy URL before production release
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://example.com/privacy"))
+                            val intent = Intent(Intent.ACTION_VIEW,
+                                "https://shinbearstudio.blogspot.com/2026/01/privacy-policy.html".toUri())
                             context.startActivity(intent)
                         }
                     )
@@ -125,7 +125,6 @@ fun SettingsScreen(
 //                        title = "Terms of Service",
 //                        subtitle = "Read our terms and conditions",
 //                        onClick = {
-//                            // TODO: Replace with actual terms of service URL before production release
 //                            val intent = Intent(Intent.ACTION_VIEW,
 //                                "https://example.com/terms".toUri())
 //                            context.startActivity(intent)
@@ -189,7 +188,7 @@ fun SettingsScreen(
                         onClick = {
                             // TODO: Replace with actual support email before production release
                             val intent = Intent(Intent.ACTION_SENDTO).apply {
-                                data = Uri.parse("mailto:feedback@example.com")
+                                data = "mailto:ngochand2901@gmail.com".toUri()
                                 putExtra(Intent.EXTRA_SUBJECT, "DevInfo Feedback")
                             }
                             context.startActivity(intent)
