@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.anhprgm.deviceinfo"
+    namespace = "com.anhprgm.deviceinfo" // com.shin.bear.studio.apps.deviceinfo
     compileSdk = 36
 
     defaultConfig {
@@ -12,7 +12,7 @@ android {
         minSdk = 24
         targetSdk = 36
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.0.1"
 
         vectorDrawables {
             useSupportLibrary = true
