@@ -7,9 +7,13 @@ data class SensorInfo(
 
 data class SensorDetail(
     val name: String,
-    val type: String,
+    val kind: SensorKind,
+    /** Raw platform type constant, kept so [SensorKind.OTHER] can still be labelled. */
+    val rawType: Int,
     val vendor: String,
-    val power: String,
-    val maxRange: String,
-    val resolution: String
+    val version: Int,
+    val powerMilliAmps: Float,
+    val maximumRange: Float,
+    val resolution: Float,
+    val isWakeUpSensor: Boolean
 )

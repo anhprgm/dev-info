@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -17,6 +17,8 @@ import androidx.compose.ui.unit.dp
 import com.anhprgm.deviceinfo.ui.components.DetailRow
 import com.anhprgm.deviceinfo.ui.components.InfoCard
 import com.anhprgm.deviceinfo.ui.components.LoadingState
+import com.anhprgm.deviceinfo.ui.format.Formatters
+import com.anhprgm.deviceinfo.ui.format.Labels
 import com.anhprgm.deviceinfo.ui.viewmodel.DeviceInfoViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -38,7 +40,7 @@ fun BatteryScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 actions = {
@@ -73,21 +75,23 @@ fun BatteryScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
+                        val level = battery.level
                         Text(
-                            text = "${battery.level}%",
+                            text = Formatters.percentInt(level),
                             style = MaterialTheme.typography.displayLarge,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         LinearProgressIndicator(
-                            progress = battery.level / 100f,
+                            progress = { (level ?: 0) / 100f },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(8.dp),
                             color = when {
-                                battery.level > 60 -> MaterialTheme.colorScheme.primary
-                                battery.level > 20 -> MaterialTheme.colorScheme.tertiary
+                                level == null -> MaterialTheme.colorScheme.outline
+                                level > 60 -> MaterialTheme.colorScheme.primary
+                                level > 20 -> MaterialTheme.colorScheme.tertiary
                                 else -> MaterialTheme.colorScheme.error
                             }
                         )
@@ -95,21 +99,30 @@ fun BatteryScreen(
                 }
 
                 InfoCard(title = "Status") {
-                    DetailRow(label = "Charging Status", value = battery.chargingStatus)
+                    DetailRow(label = "Charging Status", value = Labels.of(battery.status))
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                    DetailRow(label = "Health", value = battery.health)
+                    DetailRow(label = "Health", value = Labels.of(battery.health))
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                    DetailRow(label = "Technology", value = battery.technology)
+                    DetailRow(label = "Technology", value = Formatters.text(battery.technology))
                 }
 
                 InfoCard(title = "Technical Details") {
-                    DetailRow(label = "Temperature", value = battery.temperature)
+                    DetailRow(
+                        label = "Temperature",
+                        value = Formatters.celsius(battery.temperatureCelsius)
+                    )
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                    DetailRow(label = "Voltage", value = battery.voltage)
+                    DetailRow(label = "Voltage", value = Formatters.volts(battery.voltageVolts))
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                    DetailRow(label = "Capacity", value = battery.capacity)
+                    DetailRow(
+                        label = "Estimated Capacity",
+                        value = Formatters.milliAmpHours(battery.estimatedCapacityMah)
+                    )
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                    DetailRow(label = "Charge Cycles", value = battery.chargeCycles)
+                    DetailRow(
+                        label = "Charge Cycles",
+                        value = Formatters.count(battery.chargeCycles, "cycles")
+                    )
                 }
             }
         } ?: LoadingState(modifier = Modifier.padding(paddingValues))

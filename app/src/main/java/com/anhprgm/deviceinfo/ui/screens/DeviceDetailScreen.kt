@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
@@ -16,6 +16,8 @@ import androidx.compose.ui.unit.dp
 import com.anhprgm.deviceinfo.ui.components.DetailRow
 import com.anhprgm.deviceinfo.ui.components.InfoCard
 import com.anhprgm.deviceinfo.ui.components.LoadingState
+import com.anhprgm.deviceinfo.ui.format.Formatters
+import com.anhprgm.deviceinfo.ui.format.Labels
 import com.anhprgm.deviceinfo.ui.viewmodel.DeviceInfoViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -37,7 +39,7 @@ fun DeviceDetailScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -65,6 +67,10 @@ fun DeviceDetailScreen(
                     DetailRow(label = "Model", value = device.model)
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                     DetailRow(label = "Brand", value = device.brand)
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                    DetailRow(label = "Device", value = device.device)
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                    DetailRow(label = "Board", value = device.board)
                 }
 
                 InfoCard(title = "System Information") {
@@ -72,10 +78,25 @@ fun DeviceDetailScreen(
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                     DetailRow(label = "API Level", value = device.apiLevel.toString())
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                    DetailRow(label = "Security Patch", value = device.securityPatch)
+                    DetailRow(
+                        label = "Security Patch",
+                        value = Formatters.text(device.securityPatch)
+                    )
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                    DetailRow(label = "Uptime", value = Formatters.duration(device.uptimeMillis))
                 }
 
                 InfoCard(title = "Build Information") {
+                    DetailRow(label = "Build ID", value = device.buildId)
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                    DetailRow(label = "Bootloader", value = Formatters.text(device.bootloader))
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                    DetailRow(
+                        label = "Supported ABIs",
+                        value = device.supportedAbis.joinToString(", ")
+                            .ifBlank { Formatters.NOT_AVAILABLE }
+                    )
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                     DetailRow(label = "Build Fingerprint", value = device.buildFingerprint)
                 }
             }

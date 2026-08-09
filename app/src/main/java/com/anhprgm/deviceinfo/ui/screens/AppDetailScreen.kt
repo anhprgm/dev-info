@@ -11,7 +11,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Apps
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
@@ -26,8 +25,13 @@ import androidx.core.graphics.drawable.toBitmap
 import com.anhprgm.deviceinfo.data.models.AppInfo
 import com.anhprgm.deviceinfo.ui.components.DetailRow
 import com.anhprgm.deviceinfo.ui.components.InfoCard
+import com.anhprgm.deviceinfo.ui.format.Formatters
+import com.anhprgm.deviceinfo.ui.format.Labels
 import com.anhprgm.deviceinfo.ui.viewmodel.DeviceInfoViewModel
 import kotlinx.coroutines.Dispatchers
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -136,7 +140,7 @@ fun AppDetailScreen(
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "v${appInfo.versionName}",
+                        text = "v${Formatters.text(appInfo.versionName)}",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
@@ -147,11 +151,19 @@ fun AppDetailScreen(
             InfoCard(title = "Basic Information") {
                 DetailRow(label = "Package Name", value = appInfo.packageName)
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                DetailRow(label = "Version", value = appInfo.versionName)
+                DetailRow(label = "Version", value = Formatters.text(appInfo.versionName))
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                DetailRow(label = "Install Date", value = appInfo.installTime)
+                DetailRow(label = "Version Code", value = appInfo.versionCode.toString())
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                DetailRow(label = "Size", value = appInfo.size)
+                DetailRow(label = "Installed", value = formatDate(appInfo.firstInstallTimeMillis))
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                DetailRow(label = "Last Updated", value = formatDate(appInfo.lastUpdateTimeMillis))
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                DetailRow(label = "APK Size", value = Formatters.bytes(appInfo.apkSizeBytes))
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                DetailRow(label = "Type", value = if (appInfo.isSystemApp) "System" else "User")
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                DetailRow(label = "Target SDK", value = appInfo.targetSdk.toString())
             }
 
             // Permissions
@@ -231,8 +243,8 @@ private fun shareApp(context: Context, appInfo: AppInfo) {
         val shareText = """
             App: ${appInfo.appName}
             Package: ${appInfo.packageName}
-            Version: ${appInfo.versionName}
-            Installed: ${appInfo.installTime}
+            Version: ${appInfo.versionName ?: "?"}
+            Installed: ${formatDate(appInfo.firstInstallTimeMillis)}
             
             https://play.google.com/store/apps/details?id=${appInfo.packageName}
         """.trimIndent()
@@ -248,3 +260,11 @@ private fun shareApp(context: Context, appInfo: AppInfo) {
         e.printStackTrace()
     }
 }
+
+/**
+ * Install timestamps are stored raw on the model and formatted here, so the
+ * app-list sort can order by the actual epoch value rather than by a string.
+ */
+private fun formatDate(millis: Long): String =
+    if (millis <= 0L) Formatters.NOT_AVAILABLE
+    else SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date(millis))

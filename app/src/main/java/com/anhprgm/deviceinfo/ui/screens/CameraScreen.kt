@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -15,6 +15,8 @@ import androidx.compose.ui.unit.dp
 import com.anhprgm.deviceinfo.ui.components.DetailRow
 import com.anhprgm.deviceinfo.ui.components.InfoCard
 import com.anhprgm.deviceinfo.ui.components.LoadingState
+import com.anhprgm.deviceinfo.ui.format.Formatters
+import com.anhprgm.deviceinfo.ui.format.Labels
 import com.anhprgm.deviceinfo.ui.viewmodel.DeviceInfoViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -36,7 +38,7 @@ fun CameraScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -64,34 +66,53 @@ fun CameraScreen(
                     InfoCard(title = "Camera ${index + 1}") {
                         DetailRow(label = "Camera ID", value = cameraDetail.cameraId)
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                        DetailRow(label = "Facing", value = cameraDetail.facing)
+                        DetailRow(label = "Facing", value = Labels.of(cameraDetail.facing))
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                        DetailRow(label = "Resolution", value = cameraDetail.megapixels)
+                        DetailRow(
+                            label = "Resolution",
+                            value = Formatters.megapixels(cameraDetail.megapixels)
+                        )
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                        DetailRow(label = "Image Size", value = cameraDetail.imageSize)
+                        DetailRow(
+                            label = "Image Size",
+                            value = Formatters.resolution(
+                                cameraDetail.pixelWidth,
+                                cameraDetail.pixelHeight
+                            )
+                        )
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                        DetailRow(label = "Focal Length", value = cameraDetail.focalLength)
+                        DetailRow(
+                            label = "Focal Length",
+                            value = cameraDetail.focalLengthsMm
+                                .joinToString(", ") { Formatters.millimetres(it) }
+                                .ifBlank { Formatters.NOT_AVAILABLE }
+                        )
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                        DetailRow(label = "Aperture", value = cameraDetail.aperture)
+                        DetailRow(
+                            label = "Aperture",
+                            value = cameraDetail.aperturesFStop
+                                .joinToString(", ") { Formatters.aperture(it) }
+                                .ifBlank { Formatters.NOT_AVAILABLE }
+                        )
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                         DetailRow(
                             label = "Flash Available",
-                            value = if (cameraDetail.flashAvailable) "Yes" else "No"
+                            value = Labels.yesNo(cameraDetail.flashAvailable)
                         )
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                         DetailRow(
                             label = "Optical Stabilization",
-                            value = if (cameraDetail.opticalStabilization) "Yes" else "No"
+                            value = Labels.yesNo(cameraDetail.opticalStabilization)
                         )
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                         DetailRow(
                             label = "Auto Exposure Lock",
-                            value = if (cameraDetail.autoExposureLock) "Yes" else "No"
+                            value = Labels.yesNo(cameraDetail.autoExposureLock)
                         )
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                         DetailRow(
                             label = "Auto White Balance Lock",
-                            value = if (cameraDetail.autoWhiteBalanceLock) "Yes" else "No"
+                            value = Labels.yesNo(cameraDetail.autoWhiteBalanceLock)
                         )
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                         DetailRow(
@@ -99,7 +120,11 @@ fun CameraScreen(
                             value = "${cameraDetail.sensorOrientation}°"
                         )
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                        DetailRow(label = "Output Formats", value = cameraDetail.outputFormats)
+                        DetailRow(
+                            label = "Output Formats",
+                            value = cameraDetail.outputFormats.joinToString(", ")
+                                .ifBlank { Formatters.NOT_AVAILABLE }
+                        )
                     }
                 }
             }

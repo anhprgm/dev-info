@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -15,6 +15,8 @@ import androidx.compose.ui.unit.dp
 import com.anhprgm.deviceinfo.ui.components.DetailRow
 import com.anhprgm.deviceinfo.ui.components.InfoCard
 import com.anhprgm.deviceinfo.ui.components.LoadingState
+import com.anhprgm.deviceinfo.ui.format.Formatters
+import com.anhprgm.deviceinfo.ui.format.Labels
 import com.anhprgm.deviceinfo.ui.viewmodel.DeviceInfoViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -36,7 +38,7 @@ fun DisplayScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -57,13 +59,27 @@ fun DisplayScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 InfoCard(title = "Screen Specifications") {
-                    DetailRow(label = "Resolution", value = display.resolution)
+                    DetailRow(
+                        label = "Resolution",
+                        value = Formatters.resolution(display.widthPixels, display.heightPixels)
+                    )
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                    DetailRow(label = "Screen Size", value = display.screenSize)
+                    DetailRow(
+                        label = "Screen Size",
+                        value = Formatters.inches(display.diagonalInches)
+                    )
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                    DetailRow(label = "Pixel Density", value = display.pixelDensity)
+                    DetailRow(
+                        label = "Pixel Density",
+                        value = "${display.densityDpi} dpi (${Labels.of(display.densityBucket)})"
+                    )
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                    DetailRow(label = "Refresh Rate", value = display.refreshRate)
+                    DetailRow(
+                        label = "Refresh Rate",
+                        value = Formatters.hertz(display.refreshRateHz)
+                    )
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                    DetailRow(label = "HDR", value = Labels.supported(display.hdrSupported))
                 }
             }
         } ?: LoadingState(modifier = Modifier.padding(paddingValues))

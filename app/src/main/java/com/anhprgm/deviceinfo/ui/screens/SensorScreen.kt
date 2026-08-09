@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -16,6 +16,8 @@ import androidx.compose.ui.unit.dp
 import com.anhprgm.deviceinfo.ui.components.DetailRow
 import com.anhprgm.deviceinfo.ui.components.InfoCard
 import com.anhprgm.deviceinfo.ui.components.LoadingState
+import com.anhprgm.deviceinfo.ui.format.Formatters
+import com.anhprgm.deviceinfo.ui.format.Labels
 import com.anhprgm.deviceinfo.ui.viewmodel.DeviceInfoViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -37,7 +39,7 @@ fun SensorScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 actions = {
@@ -74,15 +76,32 @@ fun SensorScreen(
                     InfoCard(title = "Sensor ${index + 1}") {
                         DetailRow(label = "Name", value = sensorDetail.name)
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                        DetailRow(label = "Type", value = sensorDetail.type)
+                        DetailRow(
+                            label = "Type",
+                            value = Labels.of(sensorDetail.kind, sensorDetail.rawType)
+                        )
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                        DetailRow(label = "Vendor", value = sensorDetail.vendor)
+                        DetailRow(label = "Vendor", value = Formatters.text(sensorDetail.vendor))
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                        DetailRow(label = "Power", value = sensorDetail.power)
+                        DetailRow(
+                            label = "Power",
+                            value = Formatters.milliAmps(sensorDetail.powerMilliAmps)
+                        )
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                        DetailRow(label = "Max Range", value = sensorDetail.maxRange)
+                        DetailRow(
+                            label = "Max Range",
+                            value = Formatters.decimal(sensorDetail.maximumRange)
+                        )
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                        DetailRow(label = "Resolution", value = sensorDetail.resolution)
+                        DetailRow(
+                            label = "Resolution",
+                            value = Formatters.decimal(sensorDetail.resolution, decimals = 4)
+                        )
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                        DetailRow(
+                            label = "Wake-up Sensor",
+                            value = Labels.yesNo(sensorDetail.isWakeUpSensor)
+                        )
                     }
                 }
             }

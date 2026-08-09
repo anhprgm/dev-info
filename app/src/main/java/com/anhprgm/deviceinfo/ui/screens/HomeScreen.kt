@@ -33,7 +33,7 @@ import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -51,6 +51,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.anhprgm.deviceinfo.ui.components.LoadingState
+import com.anhprgm.deviceinfo.ui.format.Formatters
+import com.anhprgm.deviceinfo.ui.format.Labels
 import com.anhprgm.deviceinfo.ui.viewmodel.DeviceInfoViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -144,7 +146,7 @@ fun HomeScreen(
                             }
                         }
                         Spacer(modifier = Modifier.height(16.dp))
-                        Divider(color = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f))
+                        HorizontalDivider(color = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f))
                         Spacer(modifier = Modifier.height(16.dp))
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -158,12 +160,12 @@ fun HomeScreen(
                             QuickStatItem(
                                 icon = Icons.Default.BatteryChargingFull,
                                 label = "Battery",
-                                value = "${batteryInfo?.level ?: 0}%"
+                                value = Formatters.percentInt(batteryInfo?.level)
                             )
                             QuickStatItem(
                                 icon = Icons.Default.Memory,
                                 label = "RAM",
-                                value = hardwareInfo?.totalRam ?: "N/A"
+                                value = Formatters.bytes(hardwareInfo?.totalRamBytes)
                             )
                         }
                     }
@@ -193,7 +195,8 @@ fun HomeScreen(
                     QuickInfoCard(
                         icon = Icons.Default.Memory,
                         title = "Hardware",
-                        subtitle = "${hardware.totalRam} RAM • ${hardware.cpuCores} Cores",
+                        subtitle = "${Formatters.bytes(hardware.totalRamBytes)} RAM • " +
+                            "${hardware.cpuCores} Cores",
                         onClick = onNavigateToHardware
                     )
                 }
@@ -202,7 +205,8 @@ fun HomeScreen(
                     QuickInfoCard(
                         icon = Icons.Default.BatteryChargingFull,
                         title = "Battery",
-                        subtitle = "${battery.level}% • ${battery.chargingStatus}",
+                        subtitle = "${Formatters.percentInt(battery.level)} • " +
+                            Labels.of(battery.status),
                         onClick = onNavigateToBattery
                     )
                 }
@@ -211,7 +215,10 @@ fun HomeScreen(
                     QuickInfoCard(
                         icon = Icons.Default.Wifi,
                         title = "Network",
-                        subtitle = "${network.connectionType} • ${network.networkName}",
+                        subtitle = listOfNotNull(
+                            Labels.of(network.connectionType),
+                            network.ssid
+                        ).joinToString(" • "),
                         onClick = onNavigateToNetwork
                     )
                 }
@@ -220,7 +227,10 @@ fun HomeScreen(
                     QuickInfoCard(
                         icon = Icons.Default.Screenshot,
                         title = "Display",
-                        subtitle = "${display.resolution} • ${display.screenSize}",
+                        subtitle = Formatters.resolution(
+                            display.widthPixels,
+                            display.heightPixels
+                        ) + " • " + Formatters.inches(display.diagonalInches),
                         onClick = onNavigateToDisplay
                     )
                 }

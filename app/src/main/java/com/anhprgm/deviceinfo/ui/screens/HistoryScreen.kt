@@ -5,12 +5,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -21,6 +22,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.anhprgm.deviceinfo.ui.components.InfoCard
 import com.anhprgm.deviceinfo.ui.components.LoadingState
+import com.anhprgm.deviceinfo.ui.format.Formatters
+import com.anhprgm.deviceinfo.ui.format.Labels
 import com.anhprgm.deviceinfo.ui.viewmodel.DeviceInfoViewModel
 import java.text.SimpleDateFormat
 import java.util.*
@@ -44,7 +47,7 @@ fun HistoryScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 actions = {
@@ -64,8 +67,9 @@ fun HistoryScreen(
             )
         }
     ) { paddingValues ->
-        historyInfo?.let { history ->
-            if (history.history.isEmpty()) {
+        run {
+            val history = historyInfo
+            if (history.samples.isEmpty()) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -73,7 +77,8 @@ fun HistoryScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        "No history data yet. Data is collected automatically.",
+                        "No history yet. Samples are recorded while the " +
+                            "Real-time Monitoring screen is open.",
                         style = MaterialTheme.typography.bodyLarge
                     )
                 }
@@ -88,7 +93,7 @@ fun HistoryScreen(
                 ) {
                     InfoCard(title = "Battery Level History") {
                         LineChart(
-                            data = history.history.map { it.batteryLevel.toFloat() },
+                            data = history.samples.map { it.batteryLevel.toFloat() },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(200.dp),
@@ -96,53 +101,71 @@ fun HistoryScreen(
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            "Last ${history.history.size} data points",
+                            "Last ${history.samples.size} data points",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
 
-                    InfoCard(title = "CPU Usage History") {
-                        LineChart(
-                            data = history.history.map { it.cpuUsage },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(200.dp),
-                            lineColor = MaterialTheme.colorScheme.secondary
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            "CPU usage over time (%)",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                    // Samples with no CPU reading are dropped rather than plotted
+                    // as zero — see MonitoringInfo.appCpuPercent.
+                    val cpuSamples = history.samples.mapNotNull { it.cpuPercent }
+                    InfoCard(title = "App CPU Usage History") {
+                        if (cpuSamples.isEmpty()) {
+                            Text(
+                                "No CPU measurements recorded.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        } else {
+                            LineChart(
+                                data = cpuSamples,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(200.dp),
+                                lineColor = MaterialTheme.colorScheme.secondary
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                "CPU used by DevInfo over time (%)",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
 
                     InfoCard(title = "Recent Data Points") {
-                        history.history.takeLast(5).reversed().forEach { data ->
-                            val dateFormat = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
-                            val time = dateFormat.format(Date(data.timestamp))
-                            
-                            Column(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+                        val recent = history.samples.takeLast(5).reversed()
+                        val dateFormat = remember {
+                            SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+                        }
+                        recent.forEachIndexed { index, sample ->
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp)
+                            ) {
                                 Text(
-                                    text = time,
+                                    text = dateFormat.format(Date(sample.timestamp)),
                                     style = MaterialTheme.typography.bodySmall,
                                     fontWeight = FontWeight.Bold
                                 )
                                 Text(
-                                    text = "Battery: ${data.batteryLevel}% | CPU: ${"%.1f".format(data.cpuUsage)}%",
+                                    text = "Battery: ${Formatters.percentInt(sample.batteryLevel)}" +
+                                        " | CPU: ${Formatters.percent(sample.cpuPercent)}" +
+                                        " | Free RAM: ${Formatters.bytes(sample.availableRamBytes)}",
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
-                            if (data != history.history.takeLast(5).reversed().last()) {
+                            if (index != recent.lastIndex) {
                                 HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
                             }
                         }
                     }
                 }
             }
-        } ?: LoadingState(modifier = Modifier.padding(paddingValues))
+        }
     }
 }
 
@@ -157,49 +180,39 @@ fun LineChart(
     Canvas(modifier = modifier) {
         val width = size.width
         val height = size.height
-        val maxValue = data.maxOrNull() ?: 100f
-        val minValue = data.minOrNull() ?: 0f
+        val maxValue = data.max()
+        val minValue = data.min()
         val range = maxValue - minValue
-        
+
+        // Flat data makes range 0. Dividing by it yields NaN for every point,
+        // which silently renders an empty chart — draw a centred line instead.
+        fun yOf(value: Float): Float =
+            if (range <= 0f) height / 2f
+            else height - ((value - minValue) / range * height)
+
         if (data.size == 1) {
-            // Draw single point
-            val y = height - ((data[0] - minValue) / range * height)
             drawCircle(
                 color = lineColor,
                 radius = 4f,
-                center = Offset(width / 2, y)
+                center = Offset(width / 2, yOf(data[0]))
             )
             return@Canvas
         }
 
         val stepX = width / (data.size - 1)
         val path = Path()
-        
-        // Start path
-        val firstY = height - ((data[0] - minValue) / range * height)
-        path.moveTo(0f, firstY)
-        
-        // Draw line through all points
+        path.moveTo(0f, yOf(data[0]))
         data.forEachIndexed { index, value ->
-            val x = index * stepX
-            val y = height - ((value - minValue) / range * height)
-            path.lineTo(x, y)
+            path.lineTo(index * stepX, yOf(value))
         }
-        
-        drawPath(
-            path = path,
-            color = lineColor,
-            style = Stroke(width = 3f)
-        )
-        
-        // Draw points
+
+        drawPath(path = path, color = lineColor, style = Stroke(width = 3f))
+
         data.forEachIndexed { index, value ->
-            val x = index * stepX
-            val y = height - ((value - minValue) / range * height)
             drawCircle(
                 color = lineColor,
                 radius = 4f,
-                center = Offset(x, y)
+                center = Offset(index * stepX, yOf(value))
             )
         }
     }

@@ -7,6 +7,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,6 +21,8 @@ import com.anhprgm.deviceinfo.data.models.AppInfo
 import com.anhprgm.deviceinfo.ui.components.DetailRow
 import com.anhprgm.deviceinfo.ui.components.InfoCard
 import com.anhprgm.deviceinfo.ui.components.LoadingState
+import com.anhprgm.deviceinfo.ui.format.Formatters
+import com.anhprgm.deviceinfo.ui.format.Labels
 import com.anhprgm.deviceinfo.ui.viewmodel.DeviceInfoViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -56,7 +60,7 @@ fun AppManagerScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 actions = {
@@ -91,7 +95,7 @@ fun AppManagerScreen(
                     }
                     
                     IconButton(onClick = { showSortMenu = true }) {
-                        Icon(Icons.Default.Sort, contentDescription = "Sort")
+                        Icon(Icons.AutoMirrored.Filled.Sort, contentDescription = "Sort")
                     }
                     DropdownMenu(
                         expanded = showSortMenu,
@@ -156,21 +160,22 @@ fun AppManagerScreen(
                     }
                 }
                 
-                // Apply type filter
+                // Classify by FLAG_SYSTEM rather than by package-name prefix —
+                // com.android.chrome is a user-updatable app, not a system one.
                 apps = when (filterType) {
-                    "User" -> apps.filter { !it.packageName.startsWith("com.android") && 
-                                           !it.packageName.startsWith("android") }
-                    "System" -> apps.filter { it.packageName.startsWith("com.android") || 
-                                              it.packageName.startsWith("android") }
+                    "User" -> apps.filter { !it.isSystemApp }
+                    "System" -> apps.filter { it.isSystemApp }
                     else -> apps
                 }
-                
-                // Apply sorting
+
+                // Sort on the raw install timestamp; the old code sorted the
+                // formatted date string.
                 when (sortOption) {
                     SortOption.NAME_ASC -> apps.sortedBy { it.appName.lowercase() }
                     SortOption.NAME_DESC -> apps.sortedByDescending { it.appName.lowercase() }
-                    SortOption.INSTALL_DATE_ASC -> apps.sortedBy { it.installTime }
-                    SortOption.INSTALL_DATE_DESC -> apps.sortedByDescending { it.installTime }
+                    SortOption.INSTALL_DATE_ASC -> apps.sortedBy { it.firstInstallTimeMillis }
+                    SortOption.INSTALL_DATE_DESC ->
+                        apps.sortedByDescending { it.firstInstallTimeMillis }
                     SortOption.PACKAGE_NAME -> apps.sortedBy { it.packageName }
                 }
             }

@@ -9,16 +9,16 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.anhprgm.deviceinfo.data.DeviceInfoRepository
-import com.anhprgm.deviceinfo.data.HistoryDatabase
 import com.anhprgm.deviceinfo.ui.screens.*
 import com.anhprgm.deviceinfo.ui.theme.DevInfoTheme
 import com.anhprgm.deviceinfo.ui.viewmodel.DeviceInfoViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,17 +38,9 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun DevInfoApp() {
     val navController = rememberNavController()
-    val context = androidx.compose.ui.platform.LocalContext.current
-    val repository = DeviceInfoRepository(context)
-    val historyDatabase = HistoryDatabase(context)
-    val viewModel: DeviceInfoViewModel = viewModel(
-        factory = object : androidx.lifecycle.ViewModelProvider.Factory {
-            override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
-                @Suppress("UNCHECKED_CAST")
-                return DeviceInfoViewModel(repository, historyDatabase) as T
-            }
-        }
-    )
+    // Scoped to the Activity so every destination shares one instance; Hilt
+    // builds it, so the repository is no longer reconstructed on recomposition.
+    val viewModel: DeviceInfoViewModel = hiltViewModel()
 
     NavHost(navController = navController, startDestination = "home") {
         composable("home") {
@@ -69,57 +61,33 @@ fun DevInfoApp() {
             )
         }
         composable("device") {
-            DeviceDetailScreen(
-                viewModel = viewModel,
-                onNavigateBack = { navController.popBackStack() }
-            )
+            DeviceDetailScreen(viewModel = viewModel, onNavigateBack = navController::popBackStack)
         }
         composable("hardware") {
-            HardwareScreen(
-                viewModel = viewModel,
-                onNavigateBack = { navController.popBackStack() }
-            )
+            HardwareScreen(viewModel = viewModel, onNavigateBack = navController::popBackStack)
         }
         composable("battery") {
-            BatteryScreen(
-                viewModel = viewModel,
-                onNavigateBack = { navController.popBackStack() }
-            )
+            BatteryScreen(viewModel = viewModel, onNavigateBack = navController::popBackStack)
         }
         composable("network") {
-            NetworkScreen(
-                viewModel = viewModel,
-                onNavigateBack = { navController.popBackStack() }
-            )
+            NetworkScreen(viewModel = viewModel, onNavigateBack = navController::popBackStack)
         }
         composable("display") {
-            DisplayScreen(
-                viewModel = viewModel,
-                onNavigateBack = { navController.popBackStack() }
-            )
+            DisplayScreen(viewModel = viewModel, onNavigateBack = navController::popBackStack)
         }
         composable("camera") {
-            CameraScreen(
-                viewModel = viewModel,
-                onNavigateBack = { navController.popBackStack() }
-            )
+            CameraScreen(viewModel = viewModel, onNavigateBack = navController::popBackStack)
         }
         composable("sensor") {
-            SensorScreen(
-                viewModel = viewModel,
-                onNavigateBack = { navController.popBackStack() }
-            )
+            SensorScreen(viewModel = viewModel, onNavigateBack = navController::popBackStack)
         }
         composable("history") {
-            HistoryScreen(
-                viewModel = viewModel,
-                onNavigateBack = { navController.popBackStack() }
-            )
+            HistoryScreen(viewModel = viewModel, onNavigateBack = navController::popBackStack)
         }
         composable("appmanager") {
             AppManagerScreen(
                 viewModel = viewModel,
-                onNavigateBack = { navController.popBackStack() },
+                onNavigateBack = navController::popBackStack,
                 onNavigateToAppDetail = { appInfo ->
                     viewModel.selectApp(appInfo)
                     navController.navigate("appdetail")
@@ -127,31 +95,25 @@ fun DevInfoApp() {
             )
         }
         composable("appdetail") {
+            // Phase 2 replaces this with a typed route carrying the package name;
+            // today a process death here leaves the screen with nothing to show.
             val selectedApp = viewModel.selectedApp.collectAsState().value
             selectedApp?.let { app ->
                 AppDetailScreen(
                     appInfo = app,
                     viewModel = viewModel,
-                    onNavigateBack = { navController.popBackStack() }
+                    onNavigateBack = navController::popBackStack
                 )
             }
         }
         composable("monitoring") {
-            MonitoringScreen(
-                viewModel = viewModel,
-                onNavigateBack = { navController.popBackStack() }
-            )
+            MonitoringScreen(viewModel = viewModel, onNavigateBack = navController::popBackStack)
         }
         composable("benchmark") {
-            BenchmarkScreen(
-                viewModel = viewModel,
-                onNavigateBack = { navController.popBackStack() }
-            )
+            BenchmarkScreen(viewModel = viewModel, onNavigateBack = navController::popBackStack)
         }
         composable("settings") {
-            SettingsScreen(
-                onNavigateBack = { navController.popBackStack() }
-            )
+            SettingsScreen(onNavigateBack = navController::popBackStack)
         }
     }
 }
