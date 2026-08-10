@@ -70,7 +70,11 @@ androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref =
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
 
 # --- Background ------------------------------------------------------------
+# NOTE: work-runtime-ktx has been an empty artifact since 2.9.0; CoroutineWorker
+# lives in the main module now.
 androidx-work-runtime = { module = "androidx.work:work-runtime", version.ref = "work" }
+androidx-glance-appwidget = { module = "androidx.glance:glance-appwidget", version.ref = "glance" }
+androidx-glance-material3 = { module = "androidx.glance:glance-material3", version.ref = "glance" }
 
 # --- Test ------------------------------------------------------------------
 junit = { module = "junit:junit", version.ref = "junit" }

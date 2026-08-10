@@ -71,6 +71,50 @@
         </activity>
 
         <!--
+          WorkManager's default initializer must be removed because the
+          Application supplies its own Configuration with the Hilt worker
+          factory; leaving both in place makes WorkManager throw at startup.
+        -->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                android:value="androidx.startup"
+                tools:node="remove" />
+        </provider>
+
+        <!--
+          Home-screen widget. updatePeriodMillis has a 30-minute system floor,
+          so the real refresh cadence comes from DeviceSamplingWorker (15 min)
+          plus a tap to open the app.
+        -->
+        <receiver
+            android:name=".widget.DeviceInfoWidgetReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/device_info_widget" />
+        </receiver>
+
+        <!-- Quick Settings tile. TileService is available from API 24. -->
+        <service
+            android:name=".widget.DeviceInfoTileService"
+            android:exported="true"
+            android:icon="@drawable/ic_launcher_foreground"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
+        <!--
           Grants temporary read access to exported reports so they can be
           shared without any storage permission. Not exported: only URIs this
           app hands out are readable, and only for the receiving app.

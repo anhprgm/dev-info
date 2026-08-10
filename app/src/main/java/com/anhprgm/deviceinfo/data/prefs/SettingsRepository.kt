@@ -18,7 +18,9 @@ enum class ThemeMode { SYSTEM, LIGHT, DARK }
 data class AppSettings(
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     /** Material You. Only has an effect on API 31+. */
-    val dynamicColor: Boolean = true
+    val dynamicColor: Boolean = true,
+    /** Periodic history sampling. On by default, but the user can stop it. */
+    val backgroundSampling: Boolean = true
 )
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
@@ -29,13 +31,15 @@ class SettingsRepository @Inject constructor(
 ) {
     private val themeModeKey = stringPreferencesKey("theme_mode")
     private val dynamicColorKey = booleanPreferencesKey("dynamic_color")
+    private val backgroundSamplingKey = booleanPreferencesKey("background_sampling")
 
     val settings: Flow<AppSettings> = context.dataStore.data.map { prefs ->
         AppSettings(
             themeMode = prefs[themeModeKey]
                 ?.let { stored -> runCatching { ThemeMode.valueOf(stored) }.getOrNull() }
                 ?: ThemeMode.SYSTEM,
-            dynamicColor = prefs[dynamicColorKey] ?: true
+            dynamicColor = prefs[dynamicColorKey] ?: true,
+            backgroundSampling = prefs[backgroundSamplingKey] ?: true
         )
     }
 
@@ -45,5 +49,9 @@ class SettingsRepository @Inject constructor(
 
     suspend fun setDynamicColor(enabled: Boolean) {
         context.dataStore.edit { it[dynamicColorKey] = enabled }
+    }
+
+    suspend fun setBackgroundSampling(enabled: Boolean) {
+        context.dataStore.edit { it[backgroundSamplingKey] = enabled }
     }
 }

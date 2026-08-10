@@ -115,6 +115,26 @@ fun SettingsScreen(
 
             Spacer(Modifier.height(Dimens.cardSpacing))
 
+            InfoCard(title = stringResource(R.string.settings_background_sampling)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(R.string.settings_background_sampling_desc),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Switch(
+                        checked = settings.backgroundSampling,
+                        onCheckedChange = { viewModel.setBackgroundSampling(it) }
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(Dimens.cardSpacing))
+
             InfoCard(title = stringResource(R.string.settings_about)) {
                 DetailRow(
                     stringResource(R.string.settings_version),

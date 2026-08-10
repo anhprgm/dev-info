@@ -462,4 +462,7 @@
     <string name="compare_instructions">Hãy xuất báo cáo JSON trên máy khác rồi mở ở đây để so sánh song song. Việc đối chiếu với cơ sở dữ liệu cấu hình cần máy chủ, nên DevInfo so sánh theo file.</string>
     <string name="compare_pick_file">Mở báo cáo JSON</string>
     <string name="compare_load_failed">Không đọc được file này như một báo cáo DevInfo.</string>
+    <string name="widget_description">Xem nhanh pin, RAM và dung lượng trống</string>
+    <string name="settings_background_sampling">Lịch sử nền</string>
+    <string name="settings_background_sampling_desc">Ghi lại pin và bộ nhớ mỗi 15 phút để màn Lịch sử có dữ liệu. Không dùng dịch vụ chạy nền thường trú.</string>
 </resources>

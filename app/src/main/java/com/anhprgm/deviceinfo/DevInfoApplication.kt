@@ -3,16 +3,35 @@ package com.anhprgm.deviceinfo
 import android.app.Application
 import android.os.Build
 import android.os.StrictMode
+import androidx.hilt.work.HiltWorkerFactory
+import androidx.work.Configuration
+import com.anhprgm.deviceinfo.background.DeviceSamplingWorker
 import dagger.hilt.android.HiltAndroidApp
+import javax.inject.Inject
 
 @HiltAndroidApp
-class DevInfoApplication : Application() {
+class DevInfoApplication : Application(), Configuration.Provider {
+
+    /**
+     * Lets Hilt construct @HiltWorker classes, which is what makes the sampling
+     * worker able to reach the data layer without an Activity.
+     */
+    @Inject
+    lateinit var workerFactory: HiltWorkerFactory
+
+    override val workManagerConfiguration: Configuration
+        get() = Configuration.Builder()
+            .setWorkerFactory(workerFactory)
+            .build()
 
     override fun onCreate() {
         super.onCreate()
         if (BuildConfig.DEBUG) {
             enableStrictMode()
         }
+        // Finally gives the History screen something to read: saveHistoryData()
+        // previously had no call sites anywhere in the app.
+        DeviceSamplingWorker.enqueue(this)
     }
 
     /**

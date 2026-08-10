@@ -462,4 +462,7 @@
     <string name="compare_instructions">Export a JSON report on another device, then open it here to compare side by side. Cross-device comparison against a specs database would need a server, so DevInfo compares files instead.</string>
     <string name="compare_pick_file">Open a JSON report</string>
     <string name="compare_load_failed">That file could not be read as a DevInfo report.</string>
+    <string name="widget_description">Battery, RAM and free storage at a glance</string>
+    <string name="settings_background_sampling">Background history</string>
+    <string name="settings_background_sampling_desc">Record battery and memory every 15 minutes so the History screen has data. Uses no foreground service.</string>
 </resources>
