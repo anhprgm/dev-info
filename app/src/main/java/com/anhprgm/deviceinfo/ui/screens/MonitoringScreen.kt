@@ -1,22 +1,43 @@
 package com.anhprgm.deviceinfo.ui.screens
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Speed
+import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.anhprgm.deviceinfo.R
+import com.anhprgm.deviceinfo.ui.components.CategoryCard
+import com.anhprgm.deviceinfo.ui.components.CircularGauge
 import com.anhprgm.deviceinfo.ui.components.DetailRow
 import com.anhprgm.deviceinfo.ui.components.InfoCard
-import com.anhprgm.deviceinfo.ui.components.LoadingState
 import com.anhprgm.deviceinfo.ui.format.Formatters
-import com.anhprgm.deviceinfo.ui.format.Labels
+import com.anhprgm.deviceinfo.ui.theme.Dimens
+import com.anhprgm.deviceinfo.ui.theme.LocalStatusPalette
 import com.anhprgm.deviceinfo.ui.viewmodel.DeviceInfoViewModel
 import kotlinx.coroutines.delay
 
@@ -24,159 +45,147 @@ import kotlinx.coroutines.delay
 @Composable
 fun MonitoringScreen(
     viewModel: DeviceInfoViewModel,
-    onNavigateBack: () -> Unit
+    contentPadding: PaddingValues,
+    onNavigateToHistory: () -> Unit,
+    onNavigateToBenchmark: () -> Unit
 ) {
-    val monitoringInfo by viewModel.monitoringInfo.collectAsState()
-    var isActive by remember { mutableStateOf(true) }
+    val monitoring by viewModel.monitoringInfo.collectAsStateWithLifecycle()
+    val status = LocalStatusPalette.current
 
-    // Auto-refresh every 2 seconds when screen is active
-    LaunchedEffect(isActive) {
-        while (isActive) {
+    // Sampling stops as soon as the screen leaves composition, so the loop no
+    // longer runs while the user is elsewhere in the app.
+    LaunchedEffect(Unit) {
+        while (true) {
             viewModel.refreshMonitoringInfo()
-            delay(2000)
-        }
-    }
-
-    DisposableEffect(Unit) {
-        isActive = true
-        onDispose {
-            isActive = false
+            delay(2_000)
         }
     }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
-                title = { 
-                    Text(
-                        "Real-time Monitoring",
-                        fontWeight = FontWeight.Bold
-                    ) 
-                },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { viewModel.refreshMonitoringInfo() }) {
-                        Icon(
-                            Icons.Default.Refresh,
-                            contentDescription = "Refresh",
-                            tint = MaterialTheme.colorScheme.onPrimary
-                        )
-                    }
-                },
+                title = { Text(stringResource(R.string.screen_monitoring)) },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface
                 )
             )
         }
-    ) { paddingValues ->
-        monitoringInfo?.let { monitoring ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .verticalScroll(rememberScrollState())
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                InfoCard(title = "App CPU Usage") {
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        val cpu = monitoring.appCpuPercent
-                        Text(
-                            text = Formatters.percent(cpu),
-                            style = MaterialTheme.typography.displayLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        LinearProgressIndicator(
-                            progress = { (cpu ?: 0f) / 100f },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(8.dp),
-                            color = when {
-                                cpu == null -> MaterialTheme.colorScheme.outline
-                                cpu > 80 -> MaterialTheme.colorScheme.error
-                                cpu > 50 -> MaterialTheme.colorScheme.tertiary
-                                else -> MaterialTheme.colorScheme.primary
-                            }
-                        )
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Text(
-                            text = "Android 8 blocks apps from reading system-wide CPU " +
-                                "(/proc/stat), so this shows CPU used by DevInfo itself.",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-
-                InfoCard(title = "RAM Usage") {
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        val ramPercent = monitoring.ramUsagePercent
-                        Text(
-                            text = Formatters.percent(ramPercent),
-                            style = MaterialTheme.typography.displayLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.secondary
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        LinearProgressIndicator(
-                            progress = { ramPercent / 100f },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(8.dp),
-                            color = when {
-                                ramPercent > 80 -> MaterialTheme.colorScheme.error
-                                ramPercent > 50 -> MaterialTheme.colorScheme.tertiary
-                                else -> MaterialTheme.colorScheme.secondary
-                            }
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        HorizontalDivider()
-                        Spacer(modifier = Modifier.height(8.dp))
-                        DetailRow(
-                            label = "Used",
-                            value = Formatters.bytes(monitoring.ramUsedBytes)
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        DetailRow(
-                            label = "Total",
-                            value = Formatters.bytes(monitoring.ramTotalBytes)
-                        )
-                    }
-                }
-
+    ) { innerPadding ->
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(
+                start = Dimens.screenPadding,
+                end = Dimens.screenPadding,
+                top = innerPadding.calculateTopPadding() + Dimens.spaceSm,
+                bottom = contentPadding.calculateBottomPadding() + Dimens.spaceXl
+            ),
+            verticalArrangement = Arrangement.spacedBy(Dimens.cardSpacing)
+        ) {
+            item {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer
-                    )
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer
+                    ),
+                    elevation = CardDefaults.cardElevation(0.dp)
                 ) {
-                    Column(
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp)
+                            .padding(Dimens.cardPadding),
+                        horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        Text(
-                            text = "ℹ️ Auto-refreshing every 2 seconds",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                        val cpu = monitoring?.appCpuPercent
+                        CircularGauge(
+                            progress = cpu?.let { it / 100f },
+                            label = stringResource(R.string.monitoring_app_cpu),
+                            valueText = Formatters.percent(cpu, decimals = 1),
+                            color = when {
+                                cpu == null -> MaterialTheme.colorScheme.outline
+                                cpu > 80 -> status.critical
+                                cpu > 50 -> status.warning
+                                else -> MaterialTheme.colorScheme.primary
+                            }
+                        )
+                        val ram = monitoring?.ramUsagePercent
+                        CircularGauge(
+                            progress = ram?.let { it / 100f },
+                            label = stringResource(R.string.monitoring_ram),
+                            valueText = Formatters.percent(ram, decimals = 0),
+                            color = when {
+                                ram == null -> MaterialTheme.colorScheme.outline
+                                ram > 85 -> status.critical
+                                ram > 65 -> status.warning
+                                else -> MaterialTheme.colorScheme.secondary
+                            }
                         )
                     }
                 }
             }
-        } ?: LoadingState(modifier = Modifier.padding(paddingValues))
+
+            // Naming the limitation is better than showing a confident 0%.
+            item {
+                Text(
+                    text = stringResource(R.string.monitoring_cpu_explanation),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(horizontal = Dimens.spaceXs)
+                )
+            }
+
+            monitoring?.let { info ->
+                item {
+                    InfoCard(title = stringResource(R.string.monitoring_ram)) {
+                        DetailRow(
+                            stringResource(R.string.common_used),
+                            Formatters.bytes(info.ramUsedBytes)
+                        )
+                        HorizontalDivider(Modifier.padding(vertical = Dimens.spaceSm))
+                        DetailRow(
+                            stringResource(R.string.common_available),
+                            Formatters.bytes(info.ramAvailableBytes)
+                        )
+                        HorizontalDivider(Modifier.padding(vertical = Dimens.spaceSm))
+                        DetailRow(
+                            stringResource(R.string.common_total),
+                            Formatters.bytes(info.ramTotalBytes)
+                        )
+                    }
+                }
+                item {
+                    InfoCard(title = stringResource(R.string.monitoring_storage)) {
+                        DetailRow(
+                            stringResource(R.string.common_used),
+                            "${Formatters.bytes(info.storageUsedBytes)} " +
+                                "(${Formatters.percent(info.storageUsagePercent, 0)})"
+                        )
+                        HorizontalDivider(Modifier.padding(vertical = Dimens.spaceSm))
+                        DetailRow(
+                            stringResource(R.string.common_total),
+                            Formatters.bytes(info.storageTotalBytes)
+                        )
+                    }
+                }
+            }
+
+            item {
+                CategoryCard(
+                    icon = Icons.Default.History,
+                    title = stringResource(R.string.screen_history),
+                    subtitle = stringResource(R.string.history_battery_chart),
+                    onClick = onNavigateToHistory
+                )
+            }
+            item {
+                CategoryCard(
+                    icon = Icons.Default.Timer,
+                    title = stringResource(R.string.screen_benchmark),
+                    subtitle = stringResource(R.string.benchmark_section_cpu),
+                    onClick = onNavigateToBenchmark
+                )
+            }
+        }
     }
 }

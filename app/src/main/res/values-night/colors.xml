@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Must track DarkBackground / DarkPrimaryContainer in ui/theme/Color.kt. -->
+    <color name="window_background">#131318</color>
+    <color name="splash_background">#2536A7</color>
+</resources>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Must track LightBackground / LightPrimaryContainer in ui/theme/Color.kt. -->
+    <color name="window_background">#FBF8FF</color>
+    <color name="splash_background">#DFE0FF</color>
+</resources>

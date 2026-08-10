@@ -1,4 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.DevInfo" parent="android:Theme.Material.Light.NoActionBar" />
+    <!--
+      Parented to Theme.SplashScreen rather than the old framework theme
+      (android:Theme.Material.Light.NoActionBar), which had no dark variant —
+      so the launch window flashed white before Compose drew, even in dark mode.
+    -->
+    <style name="Theme.DevInfo" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/splash_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <item name="postSplashScreenTheme">@style/Theme.DevInfo.Main</item>
+    </style>
+
+    <style name="Theme.DevInfo.Main" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/window_background</item>
+        <!-- Edge-to-edge is applied in code; these keep the bars transparent
+             so the Compose content can draw behind them. -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+    </style>
 </resources>

@@ -1,24 +1,34 @@
 package com.anhprgm.deviceinfo.ui.screens
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.anhprgm.deviceinfo.R
 import com.anhprgm.deviceinfo.data.models.ConnectionType
+import com.anhprgm.deviceinfo.ui.components.CopyableRow
+import com.anhprgm.deviceinfo.ui.components.DetailColumn
 import com.anhprgm.deviceinfo.ui.components.DetailRow
+import com.anhprgm.deviceinfo.ui.components.DevInfoScaffold
 import com.anhprgm.deviceinfo.ui.components.InfoCard
 import com.anhprgm.deviceinfo.ui.components.LoadingState
+import com.anhprgm.deviceinfo.ui.components.NoticeCard
 import com.anhprgm.deviceinfo.ui.format.Formatters
-import com.anhprgm.deviceinfo.ui.format.Labels
+import com.anhprgm.deviceinfo.ui.format.label
+import com.anhprgm.deviceinfo.ui.format.yesNo
+import com.anhprgm.deviceinfo.ui.theme.Dimens
+import com.anhprgm.deviceinfo.ui.theme.MonospaceValue
 import com.anhprgm.deviceinfo.ui.viewmodel.DeviceInfoViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -27,92 +37,83 @@ fun NetworkScreen(
     viewModel: DeviceInfoViewModel,
     onNavigateBack: () -> Unit
 ) {
-    val networkInfo by viewModel.networkInfo.collectAsState()
+    val network by viewModel.networkInfo.collectAsStateWithLifecycle()
+    val copied = stringResource(R.string.action_copied)
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { 
-                    Text(
-                        "Network Information",
-                        fontWeight = FontWeight.Bold
-                    ) 
-                },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { viewModel.refreshNetworkInfo() }) {
-                        Icon(
-                            Icons.Default.Refresh,
-                            contentDescription = "Refresh",
-                            tint = MaterialTheme.colorScheme.onPrimary
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
-                )
-            )
-        }
-    ) { paddingValues ->
-        networkInfo?.let { network ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .verticalScroll(rememberScrollState())
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                InfoCard(title = "Connection") {
-                    DetailRow(
-                        label = "Connection Type",
-                        value = Labels.of(network.connectionType)
-                    )
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                    DetailRow(label = "Network Name", value = Formatters.text(network.ssid))
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                    DetailRow(label = "Metered", value = Labels.yesNo(network.isMetered))
-                }
-
-                InfoCard(title = "Network Details") {
-                    DetailRow(label = "IPv4 Address", value = Formatters.text(network.ipv4Address))
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                    DetailRow(label = "IPv6 Address", value = Formatters.text(network.ipv6Address))
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                    DetailRow(
-                        label = "Signal Strength",
-                        value = network.signalLevel
-                            ?.let { "$it/${network.maxSignalLevel} (${Formatters.dbm(network.rssiDbm)})" }
-                            ?: Formatters.NOT_AVAILABLE
-                    )
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                    DetailRow(
-                        label = "Link Speed",
-                        value = network.linkSpeedMbps?.let { "$it Mbps" }
-                            ?: Formatters.NOT_AVAILABLE
-                    )
-                }
-
-                // The SSID is withheld by the platform on Android 10+ without
-                // location permission, so explain the gap rather than show a blank.
-                if (network.connectionType == ConnectionType.WIFI && network.ssid == null) {
-                    InfoCard(title = "Why is the network name missing?") {
-                        Text(
-                            text = "Android 10 and later only reveal the Wi-Fi SSID to apps " +
-                                "that hold the location permission while location services " +
-                                "are switched on. DevInfo does not request it.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
+    DevInfoScaffold(
+        title = stringResource(R.string.screen_network),
+        onNavigateBack = onNavigateBack,
+        actions = {
+            IconButton(onClick = { viewModel.refreshNetworkInfo() }) {
+                Icon(Icons.Default.Refresh, stringResource(R.string.action_refresh))
             }
-        } ?: LoadingState(modifier = Modifier.padding(paddingValues))
+        }
+    ) { padding ->
+        val info = network
+        if (info == null) {
+            LoadingState(modifier = Modifier.padding(padding))
+            return@DevInfoScaffold
+        }
+
+        DetailColumn(padding) {
+            InfoCard(title = stringResource(R.string.network_section_connection)) {
+                DetailRow(
+                    stringResource(R.string.network_type),
+                    info.connectionType.label()
+                )
+                HorizontalDivider(Modifier.padding(vertical = Dimens.spaceSm))
+                DetailRow(stringResource(R.string.network_name), Formatters.text(info.ssid))
+                HorizontalDivider(Modifier.padding(vertical = Dimens.spaceSm))
+                DetailRow(stringResource(R.string.network_metered), info.isMetered.yesNo())
+            }
+
+            Spacer(Modifier.height(Dimens.cardSpacing))
+
+            InfoCard(title = stringResource(R.string.network_section_details)) {
+                CopyableRow(
+                    label = stringResource(R.string.network_ipv4),
+                    value = Formatters.text(info.ipv4Address),
+                    copiedMessage = copied,
+                    valueStyle = MonospaceValue
+                )
+                HorizontalDivider(Modifier.padding(vertical = Dimens.spaceSm))
+                CopyableRow(
+                    label = stringResource(R.string.network_ipv6),
+                    value = Formatters.text(info.ipv6Address),
+                    copiedMessage = copied,
+                    valueStyle = MonospaceValue
+                )
+                HorizontalDivider(Modifier.padding(vertical = Dimens.spaceSm))
+                DetailRow(
+                    stringResource(R.string.network_signal),
+                    info.signalLevel?.let { level ->
+                        stringResource(
+                            R.string.network_signal_format,
+                            level,
+                            info.maxSignalLevel,
+                            Formatters.dbm(info.rssiDbm)
+                        )
+                    } ?: Formatters.NOT_AVAILABLE
+                )
+                HorizontalDivider(Modifier.padding(vertical = Dimens.spaceSm))
+                DetailRow(
+                    stringResource(R.string.network_link_speed),
+                    info.linkSpeedMbps
+                        ?.let { stringResource(R.string.network_link_speed_format, it) }
+                        ?: Formatters.NOT_AVAILABLE
+                )
+            }
+
+            // The platform withholds the SSID on Android 10+ without location
+            // permission. Explaining the gap beats printing a bare "N/A".
+            if (info.connectionType == ConnectionType.WIFI && info.ssid == null) {
+                Spacer(Modifier.height(Dimens.cardSpacing))
+                NoticeCard(
+                    title = stringResource(R.string.network_ssid_hidden_title),
+                    message = stringResource(R.string.network_ssid_hidden_message),
+                    icon = Icons.Default.Info
+                )
+            }
+        }
     }
 }

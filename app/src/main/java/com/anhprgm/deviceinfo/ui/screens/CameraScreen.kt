@@ -1,22 +1,28 @@
 package com.anhprgm.deviceinfo.ui.screens
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.*
+import androidx.compose.material.icons.filled.NoPhotography
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.anhprgm.deviceinfo.R
+import com.anhprgm.deviceinfo.ui.components.DetailColumn
 import com.anhprgm.deviceinfo.ui.components.DetailRow
+import com.anhprgm.deviceinfo.ui.components.DevInfoScaffold
+import com.anhprgm.deviceinfo.ui.components.EmptyState
 import com.anhprgm.deviceinfo.ui.components.InfoCard
 import com.anhprgm.deviceinfo.ui.components.LoadingState
 import com.anhprgm.deviceinfo.ui.format.Formatters
-import com.anhprgm.deviceinfo.ui.format.Labels
+import com.anhprgm.deviceinfo.ui.format.label
+import com.anhprgm.deviceinfo.ui.format.yesNo
+import com.anhprgm.deviceinfo.ui.theme.Dimens
 import com.anhprgm.deviceinfo.ui.viewmodel.DeviceInfoViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -25,109 +31,94 @@ fun CameraScreen(
     viewModel: DeviceInfoViewModel,
     onNavigateBack: () -> Unit
 ) {
-    val cameraInfo by viewModel.cameraInfo.collectAsState()
+    val camera by viewModel.cameraInfo.collectAsStateWithLifecycle()
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { 
-                    Text(
-                        "Camera Information",
-                        fontWeight = FontWeight.Bold
-                    ) 
-                },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
-                )
+    DevInfoScaffold(
+        title = stringResource(R.string.screen_camera),
+        onNavigateBack = onNavigateBack
+    ) { padding ->
+        val info = camera
+        when {
+            info == null -> LoadingState(modifier = Modifier.padding(padding))
+
+            info.cameras.isEmpty() -> EmptyState(
+                icon = Icons.Default.NoPhotography,
+                title = stringResource(R.string.common_not_supported),
+                modifier = Modifier.padding(padding)
             )
-        }
-    ) { paddingValues ->
-        cameraInfo?.let { camera ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .verticalScroll(rememberScrollState())
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                InfoCard(title = "Overview") {
-                    DetailRow(label = "Total Cameras", value = camera.cameraCount.toString())
+
+            else -> DetailColumn(padding) {
+                InfoCard(title = stringResource(R.string.common_overview)) {
+                    DetailRow(
+                        stringResource(R.string.camera_count),
+                        info.cameraCount.toString()
+                    )
                 }
 
-                camera.cameras.forEachIndexed { index, cameraDetail ->
-                    InfoCard(title = "Camera ${index + 1}") {
-                        DetailRow(label = "Camera ID", value = cameraDetail.cameraId)
-                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                        DetailRow(label = "Facing", value = Labels.of(cameraDetail.facing))
-                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                info.cameras.forEachIndexed { index, lens ->
+                    Spacer(Modifier.height(Dimens.cardSpacing))
+                    InfoCard(title = stringResource(R.string.camera_number, index + 1)) {
+                        DetailRow(stringResource(R.string.camera_id), lens.cameraId)
+                        HorizontalDivider(Modifier.padding(vertical = Dimens.spaceSm))
+                        DetailRow(stringResource(R.string.camera_facing), lens.facing.label())
+                        HorizontalDivider(Modifier.padding(vertical = Dimens.spaceSm))
                         DetailRow(
-                            label = "Resolution",
-                            value = Formatters.megapixels(cameraDetail.megapixels)
+                            stringResource(R.string.camera_resolution),
+                            Formatters.megapixels(lens.megapixels)
                         )
-                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                        HorizontalDivider(Modifier.padding(vertical = Dimens.spaceSm))
                         DetailRow(
-                            label = "Image Size",
-                            value = Formatters.resolution(
-                                cameraDetail.pixelWidth,
-                                cameraDetail.pixelHeight
-                            )
+                            stringResource(R.string.camera_image_size),
+                            Formatters.resolution(lens.pixelWidth, lens.pixelHeight)
                         )
-                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                        HorizontalDivider(Modifier.padding(vertical = Dimens.spaceSm))
                         DetailRow(
-                            label = "Focal Length",
-                            value = cameraDetail.focalLengthsMm
+                            stringResource(R.string.camera_focal_length),
+                            lens.focalLengthsMm
                                 .joinToString(", ") { Formatters.millimetres(it) }
                                 .ifBlank { Formatters.NOT_AVAILABLE }
                         )
-                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                        HorizontalDivider(Modifier.padding(vertical = Dimens.spaceSm))
                         DetailRow(
-                            label = "Aperture",
-                            value = cameraDetail.aperturesFStop
+                            stringResource(R.string.camera_aperture),
+                            lens.aperturesFStop
                                 .joinToString(", ") { Formatters.aperture(it) }
                                 .ifBlank { Formatters.NOT_AVAILABLE }
                         )
-                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                        HorizontalDivider(Modifier.padding(vertical = Dimens.spaceSm))
                         DetailRow(
-                            label = "Flash Available",
-                            value = Labels.yesNo(cameraDetail.flashAvailable)
+                            stringResource(R.string.camera_flash),
+                            lens.flashAvailable.yesNo()
                         )
-                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                        HorizontalDivider(Modifier.padding(vertical = Dimens.spaceSm))
                         DetailRow(
-                            label = "Optical Stabilization",
-                            value = Labels.yesNo(cameraDetail.opticalStabilization)
+                            stringResource(R.string.camera_ois),
+                            lens.opticalStabilization.yesNo()
                         )
-                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                        HorizontalDivider(Modifier.padding(vertical = Dimens.spaceSm))
                         DetailRow(
-                            label = "Auto Exposure Lock",
-                            value = Labels.yesNo(cameraDetail.autoExposureLock)
+                            stringResource(R.string.camera_ae_lock),
+                            lens.autoExposureLock.yesNo()
                         )
-                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                        HorizontalDivider(Modifier.padding(vertical = Dimens.spaceSm))
                         DetailRow(
-                            label = "Auto White Balance Lock",
-                            value = Labels.yesNo(cameraDetail.autoWhiteBalanceLock)
+                            stringResource(R.string.camera_awb_lock),
+                            lens.autoWhiteBalanceLock.yesNo()
                         )
-                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                        HorizontalDivider(Modifier.padding(vertical = Dimens.spaceSm))
                         DetailRow(
-                            label = "Sensor Orientation",
-                            value = "${cameraDetail.sensorOrientation}°"
+                            stringResource(R.string.camera_orientation),
+                            "${lens.sensorOrientation}°"
                         )
-                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                        HorizontalDivider(Modifier.padding(vertical = Dimens.spaceSm))
                         DetailRow(
-                            label = "Output Formats",
-                            value = cameraDetail.outputFormats.joinToString(", ")
+                            stringResource(R.string.camera_formats),
+                            lens.outputFormats.joinToString(", ")
                                 .ifBlank { Formatters.NOT_AVAILABLE }
                         )
                     }
                 }
             }
-        } ?: LoadingState(modifier = Modifier.padding(paddingValues))
+        }
     }
 }

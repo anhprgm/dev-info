@@ -1,22 +1,27 @@
 package com.anhprgm.deviceinfo.ui.screens
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.*
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.anhprgm.deviceinfo.R
+import com.anhprgm.deviceinfo.ui.components.DetailColumn
 import com.anhprgm.deviceinfo.ui.components.DetailRow
+import com.anhprgm.deviceinfo.ui.components.DevInfoScaffold
 import com.anhprgm.deviceinfo.ui.components.InfoCard
 import com.anhprgm.deviceinfo.ui.components.LoadingState
 import com.anhprgm.deviceinfo.ui.format.Formatters
-import com.anhprgm.deviceinfo.ui.format.Labels
+import com.anhprgm.deviceinfo.ui.theme.Dimens
 import com.anhprgm.deviceinfo.ui.viewmodel.DeviceInfoViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -25,89 +30,80 @@ fun HardwareScreen(
     viewModel: DeviceInfoViewModel,
     onNavigateBack: () -> Unit
 ) {
-    val hardwareInfo by viewModel.hardwareInfo.collectAsState()
+    val hardware by viewModel.hardwareInfo.collectAsStateWithLifecycle()
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { 
-                    Text(
-                        "Hardware Information",
-                        fontWeight = FontWeight.Bold
-                    ) 
-                },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
-                )
-            )
-        }
-    ) { paddingValues ->
-        hardwareInfo?.let { hardware ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .verticalScroll(rememberScrollState())
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                InfoCard(title = "Memory (RAM)") {
-                    DetailRow(label = "Total RAM", value = Formatters.bytes(hardware.totalRamBytes))
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                    DetailRow(
-                        label = "Available RAM",
-                        value = Formatters.bytes(hardware.availableRamBytes)
-                    )
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                    DetailRow(
-                        label = "Used RAM",
-                        value = "${Formatters.bytes(hardware.usedRamBytes)} " +
-                            "(${Formatters.percent(hardware.ramUsagePercent)})"
-                    )
-                }
-
-                InfoCard(title = "Storage") {
-                    DetailRow(
-                        label = "Total Storage",
-                        value = Formatters.bytes(hardware.totalStorageBytes)
-                    )
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                    DetailRow(
-                        label = "Available Storage",
-                        value = Formatters.bytes(hardware.availableStorageBytes)
-                    )
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                    DetailRow(
-                        label = "Used Storage",
-                        value = "${Formatters.bytes(hardware.usedStorageBytes)} " +
-                            "(${Formatters.percent(hardware.storageUsagePercent)})"
-                    )
-                }
-
-                InfoCard(title = "Processor (CPU)") {
-                    DetailRow(label = "CPU Information", value = hardware.cpuModel)
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                    DetailRow(label = "CPU Cores", value = hardware.cpuCores.toString())
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                    DetailRow(
-                        label = "Max Frequency",
-                        value = Formatters.megahertzFromKhz(hardware.cpuMaxFrequencyKhz)
-                    )
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                    DetailRow(
-                        label = "Supported ABIs",
-                        value = hardware.supportedAbis.joinToString(", ")
-                            .ifBlank { Formatters.NOT_AVAILABLE }
-                    )
-                }
+    DevInfoScaffold(
+        title = stringResource(R.string.screen_hardware),
+        onNavigateBack = onNavigateBack,
+        actions = {
+            IconButton(onClick = { viewModel.refreshHardwareInfo() }) {
+                Icon(Icons.Default.Refresh, stringResource(R.string.action_refresh))
             }
-        } ?: LoadingState(modifier = Modifier.padding(paddingValues))
+        }
+    ) { padding ->
+        val info = hardware
+        if (info == null) {
+            LoadingState(modifier = Modifier.padding(padding))
+            return@DevInfoScaffold
+        }
+
+        DetailColumn(padding) {
+            InfoCard(title = stringResource(R.string.hardware_section_memory)) {
+                DetailRow(
+                    stringResource(R.string.hardware_total_ram),
+                    Formatters.bytes(info.totalRamBytes)
+                )
+                HorizontalDivider(Modifier.padding(vertical = Dimens.spaceSm))
+                DetailRow(
+                    stringResource(R.string.hardware_available_ram),
+                    Formatters.bytes(info.availableRamBytes)
+                )
+                HorizontalDivider(Modifier.padding(vertical = Dimens.spaceSm))
+                DetailRow(
+                    stringResource(R.string.hardware_used_ram),
+                    "${Formatters.bytes(info.usedRamBytes)} " +
+                        "(${Formatters.percent(info.ramUsagePercent, 0)})"
+                )
+            }
+
+            Spacer(Modifier.height(Dimens.cardSpacing))
+
+            InfoCard(title = stringResource(R.string.hardware_section_storage)) {
+                DetailRow(
+                    stringResource(R.string.hardware_total_storage),
+                    Formatters.bytes(info.totalStorageBytes)
+                )
+                HorizontalDivider(Modifier.padding(vertical = Dimens.spaceSm))
+                DetailRow(
+                    stringResource(R.string.hardware_available_storage),
+                    Formatters.bytes(info.availableStorageBytes)
+                )
+                HorizontalDivider(Modifier.padding(vertical = Dimens.spaceSm))
+                DetailRow(
+                    stringResource(R.string.hardware_used_storage),
+                    "${Formatters.bytes(info.usedStorageBytes)} " +
+                        "(${Formatters.percent(info.storageUsagePercent, 0)})"
+                )
+            }
+
+            Spacer(Modifier.height(Dimens.cardSpacing))
+
+            InfoCard(title = stringResource(R.string.hardware_section_cpu)) {
+                DetailRow(stringResource(R.string.hardware_cpu_model), info.cpuModel)
+                HorizontalDivider(Modifier.padding(vertical = Dimens.spaceSm))
+                DetailRow(stringResource(R.string.hardware_cpu_cores), info.cpuCores.toString())
+                HorizontalDivider(Modifier.padding(vertical = Dimens.spaceSm))
+                // Null whenever SELinux blocks the sysfs read, which is common.
+                DetailRow(
+                    stringResource(R.string.hardware_cpu_max_freq),
+                    Formatters.megahertzFromKhz(info.cpuMaxFrequencyKhz)
+                )
+                HorizontalDivider(Modifier.padding(vertical = Dimens.spaceSm))
+                DetailRow(
+                    stringResource(R.string.device_abis),
+                    info.supportedAbis.joinToString(", ").ifBlank { Formatters.NOT_AVAILABLE }
+                )
+            }
+        }
     }
 }

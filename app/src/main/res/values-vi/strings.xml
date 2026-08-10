@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Thông tin máy</string>
+
+    <!-- ==================== Navigation ==================== -->
+    <string name="tab_info">Thông tin</string>
+    <string name="tab_monitor">Giám sát</string>
+    <string name="tab_test">Kiểm tra</string>
+    <string name="tab_tools">Công cụ</string>
+
+    <!-- ==================== Common actions ==================== -->
+    <string name="action_back">Quay lại</string>
+    <string name="action_refresh">Làm mới</string>
+    <string name="action_clear">Xoá</string>
+    <string name="action_share">Chia sẻ</string>
+    <string name="action_settings">Cài đặt</string>
+    <string name="action_grant">Cấp quyền</string>
+    <string name="action_sort">Sắp xếp</string>
+    <string name="action_filter">Lọc</string>
+    <string name="action_search">Tìm kiếm</string>
+    <string name="action_run">Chạy</string>
+    <string name="action_stop">Dừng</string>
+    <string name="action_copied">Đã sao chép</string>
+    <string name="action_long_press_to_copy">Nhấn giữ một giá trị để sao chép</string>
+
+    <!-- ==================== Common vocabulary ==================== -->
+    <string name="common_na">Không có</string>
+    <string name="common_unknown">Không rõ</string>
+    <string name="common_yes">Có</string>
+    <string name="common_no">Không</string>
+    <string name="common_supported">Có hỗ trợ</string>
+    <string name="common_not_supported">Không hỗ trợ</string>
+    <string name="common_enabled">Đang bật</string>
+    <string name="common_disabled">Đang tắt</string>
+    <string name="common_total">Tổng</string>
+    <string name="common_used">Đã dùng</string>
+    <string name="common_available">Còn trống</string>
+    <string name="common_overview">Tổng quan</string>
+    <string name="common_loading">Đang tải…</string>
+
+    <!-- ==================== Battery status ==================== -->
+    <string name="battery_status_charging">Đang sạc</string>
+    <string name="battery_status_discharging">Đang xả</string>
+    <string name="battery_status_full">Đầy</string>
+    <string name="battery_status_not_charging">Không sạc</string>
+    <string name="battery_health_good">Tốt</string>
+    <string name="battery_health_overheat">Quá nóng</string>
+    <string name="battery_health_dead">Hỏng</string>
+    <string name="battery_health_over_voltage">Quá áp</string>
+    <string name="battery_health_cold">Quá lạnh</string>
+    <string name="battery_health_failure">Lỗi</string>
+
+    <!-- ==================== Connection types ==================== -->
+    <string name="connection_wifi">Wi-Fi</string>
+    <string name="connection_cellular">Dữ liệu di động</string>
+    <string name="connection_ethernet">Ethernet</string>
+    <string name="connection_vpn">VPN</string>
+    <string name="connection_bluetooth">Bluetooth</string>
+    <string name="connection_disconnected">Chưa kết nối</string>
+
+    <!-- ==================== Camera ==================== -->
+    <string name="lens_front">Trước</string>
+    <string name="lens_back">Sau</string>
+    <string name="lens_external">Ngoài</string>
+
+    <!-- ==================== Sensors ==================== -->
+    <string name="sensor_accelerometer">Cảm biến gia tốc</string>
+    <string name="sensor_gyroscope">Con quay hồi chuyển</string>
+    <string name="sensor_light">Ánh sáng</string>
+    <string name="sensor_proximity">Tiệm cận</string>
+    <string name="sensor_magnetic_field">Từ trường</string>
+    <string name="sensor_pressure">Áp suất</string>
+    <string name="sensor_ambient_temperature">Nhiệt độ môi trường</string>
+    <string name="sensor_relative_humidity">Độ ẩm tương đối</string>
+    <string name="sensor_gravity">Trọng lực</string>
+    <string name="sensor_linear_acceleration">Gia tốc tuyến tính</string>
+    <string name="sensor_rotation_vector">Vector xoay</string>
+    <string name="sensor_step_counter">Đếm bước chân</string>
+    <string name="sensor_step_detector">Phát hiện bước chân</string>
+    <string name="sensor_heart_rate">Nhịp tim</string>
+    <string name="sensor_other">Khác (loại %1$d)</string>
+
+    <!-- ==================== Dashboard ==================== -->
+    <string name="dashboard_title">Thông tin máy</string>
+    <string name="dashboard_android">Android</string>
+    <string name="dashboard_uptime">Thời gian bật máy</string>
+    <string name="dashboard_battery">Pin</string>
+    <string name="dashboard_ram">RAM</string>
+    <string name="dashboard_storage">Lưu trữ</string>
+    <string name="dashboard_temperature">Nhiệt độ</string>
+    <string name="dashboard_categories">Danh mục</string>
+    <string name="dashboard_battery_trend">Pin theo thời gian</string>
+    <string name="dashboard_no_trend_yet">Chưa ghi được mẫu nào</string>
+
+    <!-- ==================== Info screens ==================== -->
+    <string name="screen_device">Thiết bị</string>
+    <string name="screen_hardware">Phần cứng</string>
+    <string name="screen_storage">Lưu trữ</string>
+    <string name="screen_battery">Pin</string>
+    <string name="screen_display">Màn hình</string>
+    <string name="screen_network">Mạng</string>
+    <string name="screen_camera">Camera</string>
+    <string name="screen_sensors">Cảm biến</string>
+    <string name="screen_monitoring">Giám sát trực tiếp</string>
+    <string name="screen_history">Lịch sử</string>
+    <string name="screen_benchmark">Đo hiệu năng</string>
+    <string name="screen_apps">Ứng dụng đã cài</string>
+    <string name="screen_app_detail">Chi tiết ứng dụng</string>
+    <string name="screen_settings">Cài đặt</string>
+    <string name="screen_tools">Công cụ</string>
+    <string name="screen_tests">Kiểm tra</string>
+
+    <string name="screen_device_desc">Model, bản dựng và hệ thống</string>
+    <string name="screen_hardware_desc">CPU, RAM và bộ nhớ</string>
+    <string name="screen_battery_desc">Mức pin, độ chai và nhiệt độ</string>
+    <string name="screen_display_desc">Độ phân giải, mật độ và tần số quét</string>
+    <string name="screen_network_desc">Kết nối, địa chỉ và tín hiệu</string>
+    <string name="screen_camera_desc">Ống kính và khả năng</string>
+    <string name="screen_sensors_desc">Phần cứng cảm biến có sẵn</string>
+
+    <!-- ==================== Device ==================== -->
+    <string name="device_section_basic">Thông tin cơ bản</string>
+    <string name="device_section_system">Hệ thống</string>
+    <string name="device_section_build">Bản dựng</string>
+    <string name="device_name">Tên thiết bị</string>
+    <string name="device_manufacturer">Nhà sản xuất</string>
+    <string name="device_model">Model</string>
+    <string name="device_brand">Thương hiệu</string>
+    <string name="device_codename">Mã thiết bị</string>
+    <string name="device_board">Bo mạch</string>
+    <string name="device_android_version">Phiên bản Android</string>
+    <string name="device_api_level">Mức API</string>
+    <string name="device_security_patch">Bản vá bảo mật</string>
+    <string name="device_uptime">Thời gian bật máy</string>
+    <string name="device_build_id">Mã bản dựng</string>
+    <string name="device_bootloader">Bootloader</string>
+    <string name="device_abis">ABI hỗ trợ</string>
+    <string name="device_fingerprint">Build fingerprint</string>
+
+    <!-- ==================== Hardware ==================== -->
+    <string name="hardware_section_memory">Bộ nhớ (RAM)</string>
+    <string name="hardware_section_storage">Bộ nhớ trong</string>
+    <string name="hardware_section_cpu">Bộ xử lý (CPU)</string>
+    <string name="hardware_total_ram">Tổng RAM</string>
+    <string name="hardware_available_ram">RAM còn trống</string>
+    <string name="hardware_used_ram">RAM đã dùng</string>
+    <string name="hardware_total_storage">Tổng dung lượng</string>
+    <string name="hardware_available_storage">Dung lượng còn trống</string>
+    <string name="hardware_used_storage">Dung lượng đã dùng</string>
+    <string name="hardware_cpu_model">Loại CPU</string>
+    <string name="hardware_cpu_cores">Số nhân</string>
+    <string name="hardware_cpu_max_freq">Xung nhịp tối đa</string>
+    <string name="hardware_summary">%1$s RAM • %2$d nhân</string>
+
+    <!-- ==================== Battery ==================== -->
+    <string name="battery_level">Mức pin</string>
+    <string name="battery_section_status">Trạng thái</string>
+    <string name="battery_section_technical">Thông số kỹ thuật</string>
+    <string name="battery_charging_status">Trạng thái sạc</string>
+    <string name="battery_health">Tình trạng</string>
+    <string name="battery_technology">Công nghệ</string>
+    <string name="battery_temperature">Nhiệt độ</string>
+    <string name="battery_voltage">Điện áp</string>
+    <string name="battery_capacity">Dung lượng ước tính</string>
+    <string name="battery_cycles">Số chu kỳ sạc</string>
+    <string name="battery_cycles_unit">chu kỳ</string>
+    <string name="battery_capacity_note">Ước tính từ bộ đếm điện tích — không API công khai nào cho biết dung lượng thiết kế.</string>
+
+    <!-- ==================== Display ==================== -->
+    <string name="display_section_screen">Thông số màn hình</string>
+    <string name="display_resolution">Độ phân giải</string>
+    <string name="display_size">Kích thước màn hình</string>
+    <string name="display_density">Mật độ điểm ảnh</string>
+    <string name="display_refresh_rate">Tần số quét</string>
+    <string name="display_hdr">HDR</string>
+    <string name="display_density_format">%1$d dpi (%2$s)</string>
+
+    <!-- ==================== Network ==================== -->
+    <string name="network_section_connection">Kết nối</string>
+    <string name="network_section_details">Chi tiết mạng</string>
+    <string name="network_type">Loại kết nối</string>
+    <string name="network_name">Tên mạng</string>
+    <string name="network_metered">Mạng giới hạn</string>
+    <string name="network_ipv4">Địa chỉ IPv4</string>
+    <string name="network_ipv6">Địa chỉ IPv6</string>
+    <string name="network_signal">Cường độ tín hiệu</string>
+    <string name="network_link_speed">Tốc độ liên kết</string>
+    <string name="network_signal_format">%1$d/%2$d (%3$s)</string>
+    <string name="network_link_speed_format">%1$d Mbps</string>
+    <string name="network_ssid_hidden_title">Vì sao không thấy tên mạng?</string>
+    <string name="network_ssid_hidden_message">Từ Android 10, hệ thống chỉ cho ứng dụng thấy tên mạng Wi-Fi nếu ứng dụng có quyền vị trí và dịch vụ vị trí đang bật. DevInfo không xin quyền này.</string>
+
+    <!-- ==================== Camera ==================== -->
+    <string name="camera_count">Số camera</string>
+    <string name="camera_number">Camera %1$d</string>
+    <string name="camera_id">Mã camera</string>
+    <string name="camera_facing">Hướng</string>
+    <string name="camera_resolution">Độ phân giải</string>
+    <string name="camera_image_size">Ma trận điểm ảnh</string>
+    <string name="camera_focal_length">Tiêu cự</string>
+    <string name="camera_aperture">Khẩu độ</string>
+    <string name="camera_flash">Có đèn flash</string>
+    <string name="camera_ois">Chống rung quang học</string>
+    <string name="camera_ae_lock">Khoá phơi sáng tự động</string>
+    <string name="camera_awb_lock">Khoá cân bằng trắng</string>
+    <string name="camera_orientation">Hướng cảm biến</string>
+    <string name="camera_formats">Định dạng đầu ra</string>
+
+    <!-- ==================== Sensors ==================== -->
+    <string name="sensor_count">Số cảm biến</string>
+    <string name="sensor_name">Tên</string>
+    <string name="sensor_type">Loại</string>
+    <string name="sensor_vendor">Nhà cung cấp</string>
+    <string name="sensor_power">Công suất</string>
+    <string name="sensor_max_range">Dải đo tối đa</string>
+    <string name="sensor_resolution">Độ phân giải</string>
+    <string name="sensor_wakeup">Cảm biến đánh thức</string>
+
+    <!-- ==================== Monitoring ==================== -->
+    <string name="monitoring_app_cpu">CPU của ứng dụng</string>
+    <string name="monitoring_ram">Mức dùng RAM</string>
+    <string name="monitoring_storage">Mức dùng bộ nhớ</string>
+    <string name="monitoring_cpu_explanation">Android 8 chặn ứng dụng đọc CPU toàn hệ thống (/proc/stat), nên đây là phần CPU do chính DevInfo dùng.</string>
+    <string name="monitoring_live">Đang cập nhật trực tiếp</string>
+
+    <!-- ==================== History ==================== -->
+    <string name="history_battery_chart">Mức pin</string>
+    <string name="history_cpu_chart">CPU của ứng dụng</string>
+    <string name="history_recent">Mẫu gần đây</string>
+    <string name="history_empty_title">Chưa có lịch sử</string>
+    <string name="history_empty_message">Dữ liệu được ghi khi màn hình Giám sát trực tiếp đang mở.</string>
+    <string name="history_no_cpu">Chưa ghi được số liệu CPU nào.</string>
+    <string name="history_point_count">%1$d điểm dữ liệu</string>
+    <string name="history_sample_summary">Pin %1$s • CPU %2$s • RAM trống %3$s</string>
+
+    <!-- ==================== Benchmark ==================== -->
+    <string name="benchmark_run">Chạy đo hiệu năng</string>
+    <string name="benchmark_running">Đang chạy…</string>
+    <string name="benchmark_section_cpu">Hiệu năng CPU</string>
+    <string name="benchmark_section_memory">Hiệu năng bộ nhớ</string>
+    <string name="benchmark_section_details">Chi tiết bài đo</string>
+    <string name="benchmark_overall">Điểm tổng</string>
+    <string name="benchmark_cpu_score">Điểm CPU</string>
+    <string name="benchmark_single_core">Đơn nhân</string>
+    <string name="benchmark_multi_core">Đa nhân</string>
+    <string name="benchmark_memory_score">Điểm bộ nhớ</string>
+    <string name="benchmark_total_time">Tổng thời gian</string>
+    <string name="benchmark_single_time">Thời gian đơn nhân</string>
+    <string name="benchmark_multi_time">Thời gian đa nhân</string>
+    <string name="benchmark_memory_time">Thời gian bộ nhớ</string>
+    <string name="benchmark_cores_used">Số nhân đã dùng</string>
+    <string name="benchmark_score_note">Điểm được tính theo mốc cố định và sẽ bão hoà trên máy mạnh — hãy so sánh thời gian thô.</string>
+
+    <!-- ==================== Apps ==================== -->
+    <string name="apps_total">Tổng ứng dụng</string>
+    <string name="apps_user">Ứng dụng người dùng</string>
+    <string name="apps_system">Ứng dụng hệ thống</string>
+    <string name="apps_filtered">Sau khi lọc</string>
+    <string name="apps_search_hint">Tìm ứng dụng</string>
+    <string name="apps_filter_all">Tất cả</string>
+    <string name="apps_filter_user">Người dùng</string>
+    <string name="apps_filter_system">Hệ thống</string>
+    <string name="apps_sort_name_asc">Tên (A–Z)</string>
+    <string name="apps_sort_name_desc">Tên (Z–A)</string>
+    <string name="apps_sort_newest">Ngày cài (mới nhất)</string>
+    <string name="apps_sort_oldest">Ngày cài (cũ nhất)</string>
+    <string name="apps_sort_package">Tên gói</string>
+    <string name="apps_visibility_note">Chỉ liệt kê ứng dụng có biểu tượng ngoài màn hình chính. DevInfo không xin quyền xem toàn bộ gói cài đặt.</string>
+    <string name="app_package">Tên gói</string>
+    <string name="app_version">Phiên bản</string>
+    <string name="app_version_code">Mã phiên bản</string>
+    <string name="app_installed">Ngày cài</string>
+    <string name="app_updated">Cập nhật lần cuối</string>
+    <string name="app_size">Kích thước APK</string>
+    <string name="app_type">Loại</string>
+    <string name="app_target_sdk">Target SDK</string>
+    <string name="app_permissions">Quyền</string>
+    <string name="app_open_settings">Mở trong Cài đặt</string>
+
+    <!-- ==================== Settings ==================== -->
+    <string name="settings_appearance">Giao diện</string>
+    <string name="settings_theme">Chủ đề</string>
+    <string name="settings_theme_system">Theo hệ thống</string>
+    <string name="settings_theme_light">Sáng</string>
+    <string name="settings_theme_dark">Tối</string>
+    <string name="settings_dynamic_color">Màu Material You</string>
+    <string name="settings_dynamic_color_desc">Lấy màu từ hình nền (Android 12 trở lên)</string>
+    <string name="settings_about">Giới thiệu</string>
+    <string name="settings_version">Phiên bản</string>
+    <string name="settings_privacy">Chính sách bảo mật</string>
+    <string name="settings_rate">Đánh giá ứng dụng</string>
+    <string name="settings_share">Chia sẻ ứng dụng</string>
+    <string name="settings_feedback">Gửi góp ý</string>
+    <string name="settings_legal">Pháp lý</string>
+</resources>

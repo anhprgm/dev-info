@@ -8,6 +8,8 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+    // Backs @Serializable navigation routes, and the JSON report export later.
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -26,6 +28,11 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+    }
+
+    androidResources {
+        // Strips the ~80 AndroidX locales the app does not ship strings for.
+        localeFilters += listOf("en", "vi")
     }
 
     buildTypes {
@@ -70,6 +77,44 @@ ksp {
     arg("room.schemaLocation", "$projectDir/schemas")
 }
 
+/**
+ * Fails the build on user-visible text hardcoded into a Composable.
+ *
+ * Android Lint's HardcodedText check only inspects XML — it cannot see a
+ * literal inside a `Text(...)` call, and no off-the-shelf Compose lint rule
+ * covers it. Crude, but it is the only thing that actually keeps the strings
+ * in resources once new screens start landing.
+ */
+val checkHardcodedStrings by tasks.registering {
+    group = "verification"
+    description = "Fails if a Composable passes a string literal straight to Text()."
+
+    val screenDir = layout.projectDirectory.dir("src/main/java/com/anhprgm/deviceinfo/ui")
+    inputs.dir(screenDir)
+    // No output file; the task is a pure assertion over its inputs.
+    outputs.upToDateWhen { false }
+
+    doLast {
+        val offenders = screenDir.asFile.walkTopDown()
+            .filter { it.isFile && it.extension == "kt" }
+            .flatMap { file ->
+                file.readLines().withIndex()
+                    .filter { (_, line) -> Regex("""Text\(\s*"""").containsMatchIn(line) }
+                    .map { (index, line) -> "${file.name}:${index + 1}: ${line.trim()}" }
+            }
+            .toList()
+
+        if (offenders.isNotEmpty()) {
+            throw GradleException(
+                "Hardcoded UI strings found — move them to strings.xml:\n" +
+                    offenders.joinToString("\n")
+            )
+        }
+    }
+}
+
+tasks.named("check") { dependsOn(checkHardcodedStrings) }
+
 dependencies {
     // AndroidX Core
     implementation(libs.androidx.core.ktx)
@@ -85,6 +130,8 @@ dependencies {
 
     // Navigation Compose
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.androidx.core.splashscreen)
 
     // ViewModel Compose
     implementation(libs.androidx.lifecycle.viewmodel.compose)

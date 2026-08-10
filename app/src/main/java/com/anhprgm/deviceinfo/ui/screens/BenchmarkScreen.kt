@@ -1,23 +1,32 @@
 package com.anhprgm.deviceinfo.ui.screens
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.anhprgm.deviceinfo.R
+import com.anhprgm.deviceinfo.ui.components.DetailColumn
 import com.anhprgm.deviceinfo.ui.components.DetailRow
+import com.anhprgm.deviceinfo.ui.components.DevInfoScaffold
 import com.anhprgm.deviceinfo.ui.components.InfoCard
 import com.anhprgm.deviceinfo.ui.format.Formatters
-import com.anhprgm.deviceinfo.ui.format.Labels
+import com.anhprgm.deviceinfo.ui.theme.Dimens
 import com.anhprgm.deviceinfo.ui.viewmodel.DeviceInfoViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -26,173 +35,99 @@ fun BenchmarkScreen(
     viewModel: DeviceInfoViewModel,
     onNavigateBack: () -> Unit
 ) {
-    val benchmarkResult by viewModel.benchmarkResult.collectAsState()
-    val isRunning by viewModel.isRunningBenchmark.collectAsState()
+    val result by viewModel.benchmarkResult.collectAsStateWithLifecycle()
+    val running by viewModel.isRunningBenchmark.collectAsStateWithLifecycle()
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { 
-                    Text(
-                        "Benchmark Tests",
-                        fontWeight = FontWeight.Bold
-                    ) 
-                },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
-                )
-            )
-        }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Card(
+    DevInfoScaffold(
+        title = stringResource(R.string.screen_benchmark),
+        onNavigateBack = onNavigateBack
+    ) { padding ->
+        DetailColumn(padding) {
+            Column(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                )
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    if (isRunning) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(64.dp)
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            "Running benchmark...",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                    } else {
-                        Button(
-                            onClick = { viewModel.runBenchmark() },
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Icon(
-                                Icons.Default.PlayArrow,
-                                contentDescription = null,
-                                modifier = Modifier.size(24.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text("Start Benchmark")
-                        }
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            "Test your device's CPU and memory performance",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
+                if (running) {
+                    CircularProgressIndicator(modifier = Modifier.size(48.dp))
+                    Spacer(Modifier.height(Dimens.spaceMd))
+                    Text(
+                        text = stringResource(R.string.benchmark_running),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                } else {
+                    Button(onClick = { viewModel.runBenchmark() }) {
+                        Text(stringResource(R.string.benchmark_run))
                     }
                 }
             }
 
-            benchmarkResult?.let { result ->
-                InfoCard(title = "Overall Score") {
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = result.overallScore.toString(),
-                            style = MaterialTheme.typography.displayLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = when {
-                                result.overallScore > 700 -> MaterialTheme.colorScheme.primary
-                                result.overallScore > 400 -> MaterialTheme.colorScheme.tertiary
-                                else -> MaterialTheme.colorScheme.error
-                            }
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = when {
-                                result.overallScore > 700 -> "Excellent"
-                                result.overallScore > 400 -> "Good"
-                                else -> "Average"
-                            },
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                }
+            val current = result ?: return@DetailColumn
 
-                InfoCard(title = "CPU Performance") {
-                    DetailRow(label = "CPU Score", value = result.cpuScore.toString())
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                    DetailRow(label = "Single-Core", value = result.singleCoreScore.toString())
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                    DetailRow(label = "Multi-Core", value = result.multiCoreScore.toString())
-                }
+            Spacer(Modifier.height(Dimens.spaceXl))
 
-                InfoCard(title = "Memory Performance") {
-                    DetailRow(label = "Memory Score", value = result.memoryScore.toString())
-                }
+            InfoCard(title = stringResource(R.string.benchmark_overall)) {
+                Text(
+                    text = current.overallScore.toString(),
+                    style = MaterialTheme.typography.displayMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Spacer(Modifier.height(Dimens.spaceSm))
+                // Scores derive from fixed baselines and clamp at 1000, so fast
+                // devices all saturate. Say so instead of implying comparability.
+                Text(
+                    text = stringResource(R.string.benchmark_score_note),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
 
-                InfoCard(title = "Test Details") {
-                    DetailRow(
-                        label = "Total Duration",
-                        value = Formatters.elapsed(result.totalDurationMillis)
-                    )
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                    DetailRow(
-                        label = "Single-Core Time",
-                        value = Formatters.elapsed(result.singleCoreMillis)
-                    )
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                    DetailRow(
-                        label = "Multi-Core Time",
-                        value = Formatters.elapsed(result.multiCoreMillis)
-                    )
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                    DetailRow(
-                        label = "Memory Time",
-                        value = Formatters.elapsed(result.memoryMillis)
-                    )
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                    DetailRow(label = "Cores Used", value = result.coresUsed.toString())
-                }
+            Spacer(Modifier.height(Dimens.cardSpacing))
 
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer
+            InfoCard(title = stringResource(R.string.benchmark_section_cpu)) {
+                DetailRow(
+                    stringResource(R.string.benchmark_cpu_score),
+                    current.cpuScore.toString()
+                )
+                HorizontalDivider(Modifier.padding(vertical = Dimens.spaceSm))
+                DetailRow(
+                    stringResource(R.string.benchmark_single_core),
+                    current.singleCoreScore.toString()
+                )
+                HorizontalDivider(Modifier.padding(vertical = Dimens.spaceSm))
+                DetailRow(
+                    stringResource(R.string.benchmark_multi_core),
+                    current.multiCoreScore.toString()
+                )
+            }
+
+            Spacer(Modifier.height(Dimens.cardSpacing))
+
+            InfoCard(title = stringResource(R.string.benchmark_section_details)) {
+                Column(verticalArrangement = Arrangement.spacedBy(Dimens.spaceXs)) {
+                    DetailRow(
+                        stringResource(R.string.benchmark_total_time),
+                        Formatters.elapsed(current.totalDurationMillis)
                     )
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                    ) {
-                        Text(
-                            text = "ℹ️ About Scores",
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = "Scores range from 0-1000. Higher scores indicate better performance. Results may vary based on device temperature and background processes.",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer
-                        )
-                    }
+                    HorizontalDivider(Modifier.padding(vertical = Dimens.spaceSm))
+                    DetailRow(
+                        stringResource(R.string.benchmark_single_time),
+                        Formatters.elapsed(current.singleCoreMillis)
+                    )
+                    HorizontalDivider(Modifier.padding(vertical = Dimens.spaceSm))
+                    DetailRow(
+                        stringResource(R.string.benchmark_multi_time),
+                        Formatters.elapsed(current.multiCoreMillis)
+                    )
+                    HorizontalDivider(Modifier.padding(vertical = Dimens.spaceSm))
+                    DetailRow(
+                        stringResource(R.string.benchmark_memory_time),
+                        Formatters.elapsed(current.memoryMillis)
+                    )
+                    HorizontalDivider(Modifier.padding(vertical = Dimens.spaceSm))
+                    DetailRow(
+                        stringResource(R.string.benchmark_cores_used),
+                        current.coresUsed.toString()
+                    )
                 }
             }
         }

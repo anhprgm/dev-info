@@ -1,22 +1,23 @@
 package com.anhprgm.deviceinfo.ui.screens
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.anhprgm.deviceinfo.R
+import com.anhprgm.deviceinfo.ui.components.DetailColumn
 import com.anhprgm.deviceinfo.ui.components.DetailRow
+import com.anhprgm.deviceinfo.ui.components.DevInfoScaffold
 import com.anhprgm.deviceinfo.ui.components.InfoCard
 import com.anhprgm.deviceinfo.ui.components.LoadingState
 import com.anhprgm.deviceinfo.ui.format.Formatters
 import com.anhprgm.deviceinfo.ui.format.Labels
+import com.anhprgm.deviceinfo.ui.format.supported
+import com.anhprgm.deviceinfo.ui.theme.Dimens
 import com.anhprgm.deviceinfo.ui.viewmodel.DeviceInfoViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -25,63 +26,47 @@ fun DisplayScreen(
     viewModel: DeviceInfoViewModel,
     onNavigateBack: () -> Unit
 ) {
-    val displayInfo by viewModel.displayInfo.collectAsState()
+    val display by viewModel.displayInfo.collectAsStateWithLifecycle()
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { 
-                    Text(
-                        "Display Information",
-                        fontWeight = FontWeight.Bold
-                    ) 
-                },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
-                )
-            )
+    DevInfoScaffold(
+        title = stringResource(R.string.screen_display),
+        onNavigateBack = onNavigateBack
+    ) { padding ->
+        val info = display
+        if (info == null) {
+            LoadingState(modifier = Modifier.padding(padding))
+            return@DevInfoScaffold
         }
-    ) { paddingValues ->
-        displayInfo?.let { display ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .verticalScroll(rememberScrollState())
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                InfoCard(title = "Screen Specifications") {
-                    DetailRow(
-                        label = "Resolution",
-                        value = Formatters.resolution(display.widthPixels, display.heightPixels)
+
+        DetailColumn(padding) {
+            InfoCard(title = stringResource(R.string.display_section_screen)) {
+                DetailRow(
+                    stringResource(R.string.display_resolution),
+                    Formatters.resolution(info.widthPixels, info.heightPixels)
+                )
+                HorizontalDivider(Modifier.padding(vertical = Dimens.spaceSm))
+                // Null when the device reports bogus xdpi/ydpi.
+                DetailRow(
+                    stringResource(R.string.display_size),
+                    Formatters.inches(info.diagonalInches)
+                )
+                HorizontalDivider(Modifier.padding(vertical = Dimens.spaceSm))
+                DetailRow(
+                    stringResource(R.string.display_density),
+                    stringResource(
+                        R.string.display_density_format,
+                        info.densityDpi,
+                        Labels.of(info.densityBucket)
                     )
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                    DetailRow(
-                        label = "Screen Size",
-                        value = Formatters.inches(display.diagonalInches)
-                    )
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                    DetailRow(
-                        label = "Pixel Density",
-                        value = "${display.densityDpi} dpi (${Labels.of(display.densityBucket)})"
-                    )
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                    DetailRow(
-                        label = "Refresh Rate",
-                        value = Formatters.hertz(display.refreshRateHz)
-                    )
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                    DetailRow(label = "HDR", value = Labels.supported(display.hdrSupported))
-                }
+                )
+                HorizontalDivider(Modifier.padding(vertical = Dimens.spaceSm))
+                DetailRow(
+                    stringResource(R.string.display_refresh_rate),
+                    Formatters.hertz(info.refreshRateHz)
+                )
+                HorizontalDivider(Modifier.padding(vertical = Dimens.spaceSm))
+                DetailRow(stringResource(R.string.display_hdr), info.hdrSupported.supported())
             }
-        } ?: LoadingState(modifier = Modifier.padding(paddingValues))
+        }
     }
 }
