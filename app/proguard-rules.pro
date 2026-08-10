@@ -1,21 +1,61 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.kts.
+# DevInfo R8 configuration.
 #
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# Room, Hilt and Glance ship their own consumer rules, so most of what is
+# needed arrives automatically. What does NOT is kotlinx-serialization, whose
+# generated serializers are only reached reflectively — without these rules the
+# report export throws SerializationException in a release build while working
+# perfectly in debug.
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# ---- kotlinx.serialization -------------------------------------------------
+-keepattributes *Annotation*, InnerClasses
+-dontnote kotlinx.serialization.**
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# Keep the generated Companion.serializer() for every @Serializable class.
+-if @kotlinx.serialization.Serializable class **
+-keepclassmembers class <1> {
+    static <1>$Companion Companion;
+}
+-if @kotlinx.serialization.Serializable class ** {
+    static **$* *;
+}
+-keepclassmembers class <2>$<3> {
+    kotlinx.serialization.KSerializer serializer(...);
+}
+-if @kotlinx.serialization.Serializable class **
+-keepclassmembers class <1> {
+    *** Companion;
+}
+-if @kotlinx.serialization.Serializable class ** {
+    public static ** INSTANCE;
+}
+-keepclassmembers class <1> {
+    public static ** INSTANCE;
+    kotlinx.serialization.KSerializer serializer(...);
+}
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# The report model and the typed navigation routes are both serialized.
+-keep,includedescriptorclasses class com.anhprgm.deviceinfo.data.export.**$$serializer { *; }
+-keepclassmembers class com.anhprgm.deviceinfo.data.export.** {
+    *** Companion;
+}
+-keep,includedescriptorclasses class com.anhprgm.deviceinfo.navigation.**$$serializer { *; }
+-keepclassmembers class com.anhprgm.deviceinfo.navigation.** {
+    *** Companion;
+}
+
+# ---- Navigation typed routes -----------------------------------------------
+# Route classes are resolved by name when restoring a back stack after process
+# death, which is exactly the case the AppDetail fix depends on.
+-keep class com.anhprgm.deviceinfo.navigation.** { *; }
+
+# ---- Room ------------------------------------------------------------------
+-keep class com.anhprgm.deviceinfo.data.db.entity.** { *; }
+
+# ---- Glance / widgets ------------------------------------------------------
+# The receiver and tile service are instantiated by the framework by name.
+-keep class com.anhprgm.deviceinfo.widget.** { *; }
+-keep class com.anhprgm.deviceinfo.background.** { *; }
+
+# ---- Keep line numbers for readable crash reports --------------------------
+-keepattributes SourceFile,LineNumberTable
+-renamesourcefileattribute SourceFile

@@ -23,7 +23,8 @@ android {
         versionCode = 1
         versionName = "1.0.1"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        // Hilt needs its own Application during instrumented tests.
+        testInstrumentationRunner = "com.anhprgm.deviceinfo.HiltTestRunner"
 
         vectorDrawables {
             useSupportLibrary = true
@@ -171,4 +172,6 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    androidTestImplementation(libs.hilt.android.testing)
+    kspAndroidTest(libs.hilt.compiler)
 }

@@ -27,9 +27,20 @@ data class BenchmarkResult(
         const val MULTI_CORE_BASELINE_MS = 300.0
         const val MEMORY_BASELINE_MS = 150.0
 
+        /**
+         * A reference device scores 1000. Faster hardware scores proportionally
+         * higher instead of being clamped there.
+         *
+         * The previous formula capped at 1000, so every device quicker than the
+         * baseline produced exactly 1000 and the number could not distinguish a
+         * mid-range phone from a flagship. The remaining ceiling is a sanity
+         * bound against a mis-measured near-zero duration, not a score cap.
+         */
+        const val MAX_SCORE = 20_000.0
+
         fun scoreOf(actualMs: Long, baselineMs: Double): Int {
             if (actualMs <= 0) return 0
-            return (baselineMs / actualMs * 1000.0).coerceIn(0.0, 1000.0).toInt()
+            return (baselineMs / actualMs * 1000.0).coerceAtMost(MAX_SCORE).toInt()
         }
     }
 }
