@@ -112,6 +112,16 @@
     <string name="screen_benchmark">Đo hiệu năng</string>
     <string name="screen_apps">Ứng dụng đã cài</string>
     <string name="screen_app_detail">Chi tiết ứng dụng</string>
+    <string name="screen_codecs">Codec</string>
+    <string name="screen_gpu">Đồ hoạ</string>
+    <string name="screen_sim">SIM &amp; nhà mạng</string>
+    <string name="screen_thermal">Nhiệt độ</string>
+    <string name="screen_security">Toàn vẹn</string>
+    <string name="screen_codecs_desc">Bộ giải mã và mã hoá media</string>
+    <string name="screen_gpu_desc">GPU, OpenGL ES và Vulkan</string>
+    <string name="screen_storage_desc">Dung lượng và phân tích</string>
+    <string name="screen_sim_desc">Trạng thái SIM, nhà mạng và mạng</string>
+    <string name="screen_security_desc">Mã hoá, bootloader và dấu hiệu root</string>
     <string name="screen_settings">Cài đặt</string>
     <string name="screen_tools">Công cụ</string>
     <string name="screen_tests">Kiểm tra</string>
@@ -298,4 +308,88 @@
     <string name="settings_share">Chia sẻ ứng dụng</string>
     <string name="settings_feedback">Gửi góp ý</string>
     <string name="settings_legal">Pháp lý</string>
+
+    <!-- ==================== GPU ==================== -->
+    <string name="gpu_section">Đồ hoạ (GPU)</string>
+    <string name="gpu_renderer">Bộ kết xuất</string>
+    <string name="gpu_vendor">Nhà cung cấp</string>
+    <string name="gpu_gl_version">Phiên bản OpenGL</string>
+    <string name="gpu_gles_version">OpenGL ES</string>
+    <string name="gpu_extensions">Phần mở rộng</string>
+    <string name="gpu_extension_count">%1$d phần mở rộng</string>
+    <string name="vulkan_section">Vulkan</string>
+    <string name="vulkan_support">Hỗ trợ</string>
+    <string name="vulkan_api_version">Phiên bản API</string>
+    <string name="vulkan_hardware_level">Mức phần cứng</string>
+    <string name="vulkan_device_note">Tên thiết bị Vulkan và phiên bản driver cần NDK nên không được đọc ở đây.</string>
+
+    <!-- ==================== Storage ==================== -->
+    <string name="storage_section_internal">Bộ nhớ trong</string>
+    <string name="storage_section_breakdown">Phân tích</string>
+    <string name="storage_apps">Ứng dụng (APK)</string>
+    <string name="storage_system_data">Hệ thống và dữ liệu</string>
+    <string name="storage_free">Còn trống</string>
+    <string name="storage_external">Bộ nhớ ngoài riêng của ứng dụng</string>
+    <string name="storage_emulated">Giả lập</string>
+    <string name="storage_breakdown_note">Kích thước lấy từ file APK. Muốn tách riêng dữ liệu và bộ nhớ đệm của từng ứng dụng thì cần quyền Truy cập sử dụng, nên không xin.</string>
+
+    <!-- ==================== Thermal ==================== -->
+    <string name="thermal_battery_temp">Nhiệt độ pin</string>
+    <string name="thermal_status">Trạng thái nhiệt</string>
+    <string name="thermal_headroom">Ngưỡng nhiệt còn lại</string>
+    <string name="thermal_status_none">Bình thường</string>
+    <string name="thermal_status_light">Hơi nóng</string>
+    <string name="thermal_status_moderate">Nóng vừa</string>
+    <string name="thermal_status_severe">Rất nóng</string>
+    <string name="thermal_status_critical">Nguy hiểm</string>
+    <string name="thermal_status_emergency">Khẩn cấp</string>
+    <string name="thermal_status_shutdown">Sắp tự tắt máy</string>
+    <string name="thermal_note">Nhiệt độ riêng của CPU và GPU không mở cho ứng dụng: API cần quyền đặc quyền, còn file sysfs thì bị SELinux chặn.</string>
+    <string name="requires_android_api">Cần Android API %1$d</string>
+
+    <!-- ==================== Codecs ==================== -->
+    <string name="codec_decoders">Bộ giải mã</string>
+    <string name="codec_encoders">Bộ mã hoá</string>
+    <string name="codec_hardware">Phần cứng</string>
+    <string name="codec_software">Phần mềm</string>
+    <string name="codec_count">%1$d codec</string>
+
+    <!-- ==================== Security ==================== -->
+    <string name="security_title">Tín hiệu toàn vẹn</string>
+    <string name="security_encryption">Mã hoá bộ nhớ</string>
+    <string name="security_bootloader">Bootloader</string>
+    <string name="security_bootloader_locked">Bootloader đã khoá</string>
+    <string name="security_verified_boot">Trạng thái verified boot</string>
+    <string name="security_selinux">SELinux</string>
+    <string name="security_test_keys">Ký bằng test key</string>
+    <string name="security_debuggable">Bản dựng cho phép gỡ lỗi</string>
+    <string name="security_root_signals">Dấu hiệu root</string>
+    <string name="security_root_none">Không thấy dấu hiệu nào</string>
+    <string name="security_heuristic_note">Đây chỉ là suy đoán, không phải bằng chứng. ROM tuỳ biến có thể kích hoạt các dấu hiệu này dù máy không root, và một bản can thiệp kỹ càng có thể ẩn khỏi tất cả. DevInfo không thể xác thực tính toàn vẹn của máy — việc đó cần kiểm chứng phía máy chủ.</string>
+    <string name="encryption_unsupported">Không hỗ trợ</string>
+    <string name="encryption_inactive">Chưa bật</string>
+    <string name="encryption_active">Đang bật</string>
+    <string name="encryption_active_default_key">Đang bật (khoá mặc định)</string>
+    <string name="encryption_active_per_user">Đang bật (theo người dùng)</string>
+
+    <!-- ==================== SIM ==================== -->
+    <string name="sim_section">SIM và nhà mạng</string>
+    <string name="sim_state">Trạng thái SIM</string>
+    <string name="sim_operator_name">Nhà mạng</string>
+    <string name="sim_operator_code">Mã nhà mạng (MCC+MNC)</string>
+    <string name="sim_country">Quốc gia</string>
+    <string name="sim_phone_type">Loại sóng</string>
+    <string name="sim_modem_count">Số modem đang hoạt động</string>
+    <string name="sim_network_type">Loại mạng</string>
+    <string name="sim_roaming">Chuyển vùng</string>
+    <string name="sim_no_telephony">Máy này không có phần cứng viễn thông.</string>
+    <string name="sim_permission_title">Loại mạng cần quyền Điện thoại</string>
+    <string name="sim_permission_message">Android chỉ cho biết công nghệ sóng (5G, LTE, HSPA+) với ứng dụng có quyền Điện thoại. Mọi thông tin còn lại trên màn hình này không cần quyền đó.</string>
+    <string name="sim_permission_denied">Đã từ chối quyền. Bạn có thể cấp lại trong cài đặt hệ thống.</string>
+    <string name="sim_identifiers_note">Từ Android 10, không ứng dụng nào đọc được IMEI, IMSI hay số serial phần cứng — chúng cần quyền đặc quyền do hệ thống ký.</string>
+    <string name="sim_state_absent">Không có SIM</string>
+    <string name="sim_state_ready">Sẵn sàng</string>
+    <string name="sim_state_locked">Đang khoá</string>
+    <string name="sim_state_not_ready">Chưa sẵn sàng</string>
+    <string name="sim_state_error">Lỗi</string>
 </resources>

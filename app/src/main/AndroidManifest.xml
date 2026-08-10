@@ -7,6 +7,13 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <!--
+      Optional, requested at runtime from the SIM screen only. It is the sole
+      way to report the radio technology (5G / LTE / HSPA+); every other field
+      on that screen works without it, and denial is a supported state.
+    -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
+    <!--
       Package visibility for the installed-apps list.
 
       We deliberately do NOT request QUERY_ALL_PACKAGES. Google Play treats the

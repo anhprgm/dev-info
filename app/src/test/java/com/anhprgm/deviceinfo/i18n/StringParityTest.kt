@@ -77,14 +77,17 @@ class StringParityTest {
         val en = parseStrings("values/strings.xml")
         val vi = parseStrings("values-vi/strings.xml")
 
-        // Proper nouns and platform identifiers legitimately stay identical.
+        // Proper nouns, platform identifiers and pure format strings legitimately
+        // stay identical across locales.
         val allowedIdentical = setOf(
             "connection_wifi", "connection_ethernet", "connection_vpn", "connection_bluetooth",
             "device_model", "device_bootloader", "device_fingerprint", "display_hdr",
             "display_density_format", "network_signal_format", "network_link_speed_format",
             "screen_camera", "app_target_sdk", "dashboard_android", "dashboard_ram",
             "camera_number", "hardware_summary", "history_point_count",
-            "history_sample_summary", "sensor_other"
+            "history_sample_summary", "sensor_other",
+            // Technology names — translating these would make them wrong.
+            "gpu_gles_version", "vulkan_section", "security_bootloader", "security_selinux"
         )
 
         val untranslated = en.filter { (key, value) ->

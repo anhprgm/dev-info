@@ -140,6 +140,12 @@ private fun NavGraphBuilder.infoGraph(
         composable<Sensors> {
             SensorScreen(viewModel, navController::popBackStack)
         }
+        // --- Phase 3 additions -------------------------------------------
+        composable<Gpu> { GpuScreen(navController::popBackStack) }
+        composable<Storage> { StorageScreen(navController::popBackStack) }
+        composable<Sim> { SimScreen(navController::popBackStack) }
+        composable<Codecs> { CodecScreen(navController::popBackStack) }
+        composable<Security> { SecurityScreen(navController::popBackStack) }
     }
 }
 
@@ -161,7 +167,8 @@ private fun NavGraphBuilder.monitorGraph(
                 viewModel = viewModel,
                 contentPadding = padding,
                 onNavigateToHistory = { navController.navigate(History) },
-                onNavigateToBenchmark = { navController.navigate(Benchmark) }
+                onNavigateToBenchmark = { navController.navigate(Benchmark) },
+                onNavigateToThermal = { navController.navigate(Thermal) }
             )
         }
         composable<History> {
@@ -170,6 +177,7 @@ private fun NavGraphBuilder.monitorGraph(
         composable<Benchmark> {
             BenchmarkScreen(viewModel, navController::popBackStack)
         }
+        composable<Thermal> { ThermalScreen(navController::popBackStack) }
     }
 }
 

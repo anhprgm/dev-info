@@ -15,6 +15,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BatteryFull
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.DeveloperBoard
+import androidx.compose.material.icons.filled.Movie
+import androidx.compose.material.icons.filled.Security
+import androidx.compose.material.icons.filled.SignalCellularAlt
+import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material.icons.filled.Memory
 import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.material.icons.filled.Sensors
@@ -44,6 +48,11 @@ import com.anhprgm.deviceinfo.navigation.Battery
 import com.anhprgm.deviceinfo.navigation.Camera
 import com.anhprgm.deviceinfo.navigation.DeviceDetail
 import com.anhprgm.deviceinfo.navigation.Display
+import com.anhprgm.deviceinfo.navigation.Codecs
+import com.anhprgm.deviceinfo.navigation.Gpu
+import com.anhprgm.deviceinfo.navigation.Security as SecurityRoute
+import com.anhprgm.deviceinfo.navigation.Sim
+import com.anhprgm.deviceinfo.navigation.Storage
 import com.anhprgm.deviceinfo.navigation.Hardware
 import com.anhprgm.deviceinfo.navigation.Network
 import com.anhprgm.deviceinfo.navigation.Sensors
@@ -70,11 +79,16 @@ private data class Category(
 private val categories = listOf(
     Category(Icons.Default.PhoneAndroid, R.string.screen_device, R.string.screen_device_desc, DeviceDetail),
     Category(Icons.Default.DeveloperBoard, R.string.screen_hardware, R.string.screen_hardware_desc, Hardware),
+    Category(Icons.Default.Videocam, R.string.screen_gpu, R.string.screen_gpu_desc, Gpu),
+    Category(Icons.Default.Storage, R.string.screen_storage, R.string.screen_storage_desc, Storage),
     Category(Icons.Default.BatteryFull, R.string.screen_battery, R.string.screen_battery_desc, Battery),
     Category(Icons.Default.Tv, R.string.screen_display, R.string.screen_display_desc, Display),
     Category(Icons.Default.Wifi, R.string.screen_network, R.string.screen_network_desc, Network),
+    Category(Icons.Default.SignalCellularAlt, R.string.screen_sim, R.string.screen_sim_desc, Sim),
     Category(Icons.Default.CameraAlt, R.string.screen_camera, R.string.screen_camera_desc, Camera),
-    Category(Icons.Default.Sensors, R.string.screen_sensors, R.string.screen_sensors_desc, Sensors)
+    Category(Icons.Default.Sensors, R.string.screen_sensors, R.string.screen_sensors_desc, Sensors),
+    Category(Icons.Default.Movie, R.string.screen_codecs, R.string.screen_codecs_desc, Codecs),
+    Category(Icons.Default.Security, R.string.screen_security, R.string.screen_security_desc, SecurityRoute)
 )
 
 @OptIn(ExperimentalMaterial3Api::class)

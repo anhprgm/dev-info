@@ -28,6 +28,8 @@ import kotlinx.serialization.Serializable
 @Serializable data object Network
 @Serializable data object Camera
 @Serializable data object Sensors
+@Serializable data object Gpu
+@Serializable data object Sim
 @Serializable data object Codecs
 @Serializable data object Security
 

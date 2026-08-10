@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Speed
+import androidx.compose.material.icons.filled.Thermostat
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -47,7 +48,8 @@ fun MonitoringScreen(
     viewModel: DeviceInfoViewModel,
     contentPadding: PaddingValues,
     onNavigateToHistory: () -> Unit,
-    onNavigateToBenchmark: () -> Unit
+    onNavigateToBenchmark: () -> Unit,
+    onNavigateToThermal: () -> Unit
 ) {
     val monitoring by viewModel.monitoringInfo.collectAsStateWithLifecycle()
     val status = LocalStatusPalette.current
@@ -184,6 +186,14 @@ fun MonitoringScreen(
                     title = stringResource(R.string.screen_benchmark),
                     subtitle = stringResource(R.string.benchmark_section_cpu),
                     onClick = onNavigateToBenchmark
+                )
+            }
+            item {
+                CategoryCard(
+                    icon = Icons.Default.Thermostat,
+                    title = stringResource(R.string.screen_thermal),
+                    subtitle = stringResource(R.string.thermal_battery_temp),
+                    onClick = onNavigateToThermal
                 )
             }
         }
