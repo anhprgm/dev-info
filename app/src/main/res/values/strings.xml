@@ -392,4 +392,57 @@
     <string name="sim_state_locked">Locked</string>
     <string name="sim_state_not_ready">Not ready</string>
     <string name="sim_state_error">Error</string>
+
+    <!-- ==================== Test hub ==================== -->
+    <string name="test_hub_title">Device tests</string>
+    <string name="test_hub_subtitle">Check that the hardware actually works</string>
+    <string name="test_screen">Screen test</string>
+    <string name="test_screen_desc">Dead pixels and colour banding</string>
+    <string name="test_touch">Multi-touch</string>
+    <string name="test_touch_desc">How many fingers the panel tracks</string>
+    <string name="test_sensors">Live sensors</string>
+    <string name="test_sensors_desc">Real-time accelerometer, gyroscope, compass</string>
+    <string name="test_speaker">Speakers</string>
+    <string name="test_speaker_desc">Left and right channel tones</string>
+    <string name="test_microphone">Microphone</string>
+    <string name="test_microphone_desc">Input level meter</string>
+    <string name="test_vibration">Vibration</string>
+    <string name="test_vibration_desc">Motor and amplitude control</string>
+    <string name="test_buttons">Hardware buttons</string>
+    <string name="test_buttons_desc">Volume keys</string>
+
+    <string name="test_screen_instructions">Tap to change colour. Press and hold to exit.</string>
+    <string name="test_touch_active">%1$d touching</string>
+    <string name="test_touch_max">Maximum seen: %1$d</string>
+    <string name="test_touch_instructions">Place as many fingers as you can. Press back to exit.</string>
+
+    <string name="test_speaker_left">Left</string>
+    <string name="test_speaker_right">Right</string>
+    <string name="test_speaker_both">Both</string>
+    <string name="test_speaker_playing">Playing…</string>
+    <string name="test_speaker_muted">Media volume is at zero — turn it up or you will hear nothing.</string>
+    <string name="test_mic_start">Start</string>
+    <string name="test_mic_stop">Stop</string>
+    <string name="test_mic_level">Input level</string>
+    <string name="test_mic_permission_title">Microphone permission needed</string>
+    <string name="test_mic_permission_message">The level meter reads the microphone only while this screen is open. Nothing is recorded, saved or sent anywhere.</string>
+    <string name="test_mic_absent">This device has no microphone.</string>
+    <string name="test_vibration_short">Short pulse</string>
+    <string name="test_vibration_long">Long pulse</string>
+    <string name="test_vibration_pattern">Pattern</string>
+    <string name="test_vibration_amplitude">Amplitude control</string>
+    <string name="test_vibration_absent">This device has no vibration motor.</string>
+    <string name="test_buttons_instructions">Press the volume keys. Detected presses appear below.</string>
+    <string name="test_buttons_none">No key presses detected yet</string>
+    <string name="test_buttons_volume_up">Volume up</string>
+    <string name="test_buttons_volume_down">Volume down</string>
+    <string name="test_buttons_power_note">The power button cannot be tested: Android never delivers it to apps. Fingerprint hardware can only be detected, not exercised.</string>
+
+    <string name="test_sensor_pick">Pick a sensor</string>
+    <string name="test_sensor_absent">This sensor is not present on the device.</string>
+    <string name="test_sensor_heading">Heading</string>
+    <string name="test_sensor_x">X</string>
+    <string name="test_sensor_y">Y</string>
+    <string name="test_sensor_z">Z</string>
+    <string name="test_sensor_value">Value</string>
 </resources>

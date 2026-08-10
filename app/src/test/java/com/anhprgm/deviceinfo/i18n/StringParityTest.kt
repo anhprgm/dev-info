@@ -87,7 +87,9 @@ class StringParityTest {
             "camera_number", "hardware_summary", "history_point_count",
             "history_sample_summary", "sensor_other",
             // Technology names — translating these would make them wrong.
-            "gpu_gles_version", "vulkan_section", "security_bootloader", "security_selinux"
+            "gpu_gles_version", "vulkan_section", "security_bootloader", "security_selinux",
+            // Axis labels are universal notation.
+            "test_sensor_x", "test_sensor_y", "test_sensor_z"
         )
 
         val untranslated = en.filter { (key, value) ->

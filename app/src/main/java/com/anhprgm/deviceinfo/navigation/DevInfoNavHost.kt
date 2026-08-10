@@ -26,6 +26,7 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.anhprgm.deviceinfo.ui.screens.*
+import com.anhprgm.deviceinfo.ui.screens.test.*
 import com.anhprgm.deviceinfo.ui.viewmodel.DeviceInfoViewModel
 
 @Composable
@@ -40,9 +41,16 @@ fun DevInfoNavHost(
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination
 
+    // Immersive tests must own the whole panel — a navigation bar covering the
+    // bottom defeats a dead-pixel scan and blocks the lower touch area.
+    val immersive = currentDestination?.let {
+        it.hasRoute(ScreenTest::class) || it.hasRoute(MultiTouchTest::class)
+    } == true
+
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
+            if (immersive) return@Scaffold
             NavigationBar(containerColor = MaterialTheme.colorScheme.surfaceContainer) {
                 TopLevelDestination.entries.forEach { tab ->
                     val selected = currentDestination?.hierarchy
@@ -81,6 +89,7 @@ fun DevInfoNavHost(
         ) {
             infoGraph(navController, viewModel, padding, animationsEnabled)
             monitorGraph(navController, viewModel, padding, animationsEnabled)
+            testGraph(navController, padding, animationsEnabled)
             toolsGraph(navController, viewModel, padding, animationsEnabled)
         }
     }
@@ -178,6 +187,43 @@ private fun NavGraphBuilder.monitorGraph(
             BenchmarkScreen(viewModel, navController::popBackStack)
         }
         composable<Thermal> { ThermalScreen(navController::popBackStack) }
+    }
+}
+
+// ---- Test -----------------------------------------------------------------
+
+private fun NavGraphBuilder.testGraph(
+    navController: NavHostController,
+    padding: PaddingValues,
+    animationsEnabled: Boolean
+) {
+    navigation<TestGraph>(
+        startDestination = TestHub,
+        enterTransition = { tabEnter(animationsEnabled) },
+        exitTransition = { tabExit(animationsEnabled) }
+    ) {
+        composable<TestHub> {
+            TestHubScreen(
+                contentPadding = padding,
+                onNavigate = navController::navigate
+            )
+        }
+        composable<SensorLive> { entry ->
+            val route: SensorLive = entry.toRoute()
+            SensorLiveScreen(
+                initialSensorType = route.sensorType,
+                onNavigateBack = navController::popBackStack
+            )
+        }
+        composable<SpeakerTest> { SpeakerTestScreen(navController::popBackStack) }
+        composable<MicrophoneTest> { MicrophoneTestScreen(navController::popBackStack) }
+        composable<VibrationTest> { VibrationTestScreen(navController::popBackStack) }
+        composable<ButtonTest> { ButtonTestScreen(navController::popBackStack) }
+
+        // Full-screen: no slide animation, which would drag a coloured panel
+        // across the screen and spoil the very thing being inspected.
+        composable<ScreenTest> { ScreenTestScreen(navController::popBackStack) }
+        composable<MultiTouchTest> { MultiTouchTestScreen(navController::popBackStack) }
     }
 }
 

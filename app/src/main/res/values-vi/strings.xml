@@ -392,4 +392,57 @@
     <string name="sim_state_locked">Đang khoá</string>
     <string name="sim_state_not_ready">Chưa sẵn sàng</string>
     <string name="sim_state_error">Lỗi</string>
+
+    <!-- ==================== Test hub ==================== -->
+    <string name="test_hub_title">Kiểm tra phần cứng</string>
+    <string name="test_hub_subtitle">Xem phần cứng có thực sự hoạt động không</string>
+    <string name="test_screen">Kiểm tra màn hình</string>
+    <string name="test_screen_desc">Điểm chết và dải màu</string>
+    <string name="test_touch">Đa điểm chạm</string>
+    <string name="test_touch_desc">Màn hình nhận được bao nhiêu ngón</string>
+    <string name="test_sensors">Cảm biến trực tiếp</string>
+    <string name="test_sensors_desc">Gia tốc, con quay, la bàn theo thời gian thực</string>
+    <string name="test_speaker">Loa</string>
+    <string name="test_speaker_desc">Phát âm thanh kênh trái và phải</string>
+    <string name="test_microphone">Micro</string>
+    <string name="test_microphone_desc">Đồng hồ đo mức thu</string>
+    <string name="test_vibration">Rung</string>
+    <string name="test_vibration_desc">Mô-tơ rung và điều chỉnh cường độ</string>
+    <string name="test_buttons">Nút cứng</string>
+    <string name="test_buttons_desc">Phím âm lượng</string>
+
+    <string name="test_screen_instructions">Chạm để đổi màu. Nhấn giữ để thoát.</string>
+    <string name="test_touch_active">Đang chạm: %1$d</string>
+    <string name="test_touch_max">Nhiều nhất ghi được: %1$d</string>
+    <string name="test_touch_instructions">Đặt càng nhiều ngón càng tốt. Nhấn quay lại để thoát.</string>
+
+    <string name="test_speaker_left">Trái</string>
+    <string name="test_speaker_right">Phải</string>
+    <string name="test_speaker_both">Cả hai</string>
+    <string name="test_speaker_playing">Đang phát…</string>
+    <string name="test_speaker_muted">Âm lượng media đang bằng 0 — hãy tăng lên, nếu không sẽ không nghe thấy gì.</string>
+    <string name="test_mic_start">Bắt đầu</string>
+    <string name="test_mic_stop">Dừng</string>
+    <string name="test_mic_level">Mức đầu vào</string>
+    <string name="test_mic_permission_title">Cần quyền micro</string>
+    <string name="test_mic_permission_message">Đồng hồ chỉ đọc micro khi màn hình này đang mở. Không ghi lại, không lưu và không gửi đi đâu cả.</string>
+    <string name="test_mic_absent">Máy này không có micro.</string>
+    <string name="test_vibration_short">Rung ngắn</string>
+    <string name="test_vibration_long">Rung dài</string>
+    <string name="test_vibration_pattern">Theo mẫu</string>
+    <string name="test_vibration_amplitude">Điều chỉnh cường độ</string>
+    <string name="test_vibration_absent">Máy này không có mô-tơ rung.</string>
+    <string name="test_buttons_instructions">Bấm phím âm lượng. Lần bấm nhận được sẽ hiện bên dưới.</string>
+    <string name="test_buttons_none">Chưa nhận được lần bấm nào</string>
+    <string name="test_buttons_volume_up">Tăng âm lượng</string>
+    <string name="test_buttons_volume_down">Giảm âm lượng</string>
+    <string name="test_buttons_power_note">Không thể kiểm tra nút nguồn: Android không bao giờ chuyển phím này cho ứng dụng. Cảm biến vân tay chỉ dò được là có hay không, chứ không kích hoạt được.</string>
+
+    <string name="test_sensor_pick">Chọn cảm biến</string>
+    <string name="test_sensor_absent">Máy này không có cảm biến đó.</string>
+    <string name="test_sensor_heading">Hướng</string>
+    <string name="test_sensor_x">X</string>
+    <string name="test_sensor_y">Y</string>
+    <string name="test_sensor_z">Z</string>
+    <string name="test_sensor_value">Giá trị</string>
 </resources>

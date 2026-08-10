@@ -3,9 +3,11 @@ package com.anhprgm.deviceinfo.navigation
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.outlined.Build
+import androidx.compose.material.icons.outlined.Checklist
 import androidx.compose.material.icons.outlined.Dashboard
 import androidx.compose.material.icons.outlined.Speed
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -39,6 +41,12 @@ enum class TopLevelDestination(
         labelRes = R.string.tab_monitor,
         selectedIcon = Icons.Filled.Speed,
         unselectedIcon = Icons.Outlined.Speed
+    ),
+    TEST(
+        graph = TestGraph,
+        labelRes = R.string.tab_test,
+        selectedIcon = Icons.Filled.Checklist,
+        unselectedIcon = Icons.Outlined.Checklist
     ),
     TOOLS(
         graph = ToolsGraph,

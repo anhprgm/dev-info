@@ -13,6 +13,16 @@
     -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
+    <!-- Vibration test. Normal permission: no runtime prompt. -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+    <!--
+      Microphone level meter only. Audio is read into a short-lived buffer to
+      compute an RMS level and is never written to disk, retained or sent
+      anywhere. Requested at runtime from the microphone test screen.
+    -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
     <!--
       Package visibility for the installed-apps list.
 
