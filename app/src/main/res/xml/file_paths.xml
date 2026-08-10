@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!--
+      Only the reports directory is exposed, not the whole cache. Files shared
+      from here are granted per-URI read access to the receiving app and
+      nothing else.
+    -->
+    <cache-path name="reports" path="reports/" />
+</paths>

@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Apps
+import androidx.compose.material.icons.filled.CompareArrows
+import androidx.compose.material.icons.filled.IosShare
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -18,6 +20,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.anhprgm.deviceinfo.R
 import com.anhprgm.deviceinfo.navigation.AppList
+import com.anhprgm.deviceinfo.navigation.Compare
+import com.anhprgm.deviceinfo.navigation.ExportReport
 import com.anhprgm.deviceinfo.navigation.Settings as SettingsRoute
 import com.anhprgm.deviceinfo.ui.components.CategoryCard
 import com.anhprgm.deviceinfo.ui.theme.Dimens
@@ -63,6 +67,22 @@ fun ToolsHubScreen(
                     title = stringResource(R.string.screen_apps),
                     subtitle = stringResource(R.string.tools_apps_desc),
                     onClick = { onNavigate(AppList) }
+                )
+            }
+            item {
+                CategoryCard(
+                    icon = Icons.Default.IosShare,
+                    title = stringResource(R.string.export_title),
+                    subtitle = stringResource(R.string.export_desc),
+                    onClick = { onNavigate(ExportReport) }
+                )
+            }
+            item {
+                CategoryCard(
+                    icon = Icons.Default.CompareArrows,
+                    title = stringResource(R.string.compare_title),
+                    subtitle = stringResource(R.string.compare_desc),
+                    onClick = { onNavigate(Compare) }
                 )
             }
             item {

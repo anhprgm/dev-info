@@ -445,4 +445,21 @@
     <string name="test_sensor_y">Y</string>
     <string name="test_sensor_z">Z</string>
     <string name="test_sensor_value">Giá trị</string>
+    <!-- ==================== Export ==================== -->
+    <string name="export_title">Xuất báo cáo</string>
+    <string name="export_desc">Lưu hoặc chia sẻ toàn bộ thông tin máy</string>
+    <string name="export_formats">Định dạng</string>
+    <string name="export_preview">Xem trước</string>
+    <string name="export_card_title">Thẻ thiết bị</string>
+    <string name="export_card_desc">Ảnh tóm tắt thông tin máy để chia sẻ.</string>
+    <string name="export_share_card">Chia sẻ thẻ thiết bị</string>
+    <string name="export_failed">Không ghi được báo cáo. Hãy giải phóng bớt dung lượng rồi thử lại.</string>
+    <string name="export_format_txt">TXT</string>
+    <string name="export_format_json">JSON</string>
+    <string name="export_format_pdf">PDF</string>
+    <string name="compare_title">So sánh thiết bị</string>
+    <string name="compare_desc">Đối chiếu máy này với một báo cáo đã xuất</string>
+    <string name="compare_instructions">Hãy xuất báo cáo JSON trên máy khác rồi mở ở đây để so sánh song song. Việc đối chiếu với cơ sở dữ liệu cấu hình cần máy chủ, nên DevInfo so sánh theo file.</string>
+    <string name="compare_pick_file">Mở báo cáo JSON</string>
+    <string name="compare_load_failed">Không đọc được file này như một báo cáo DevInfo.</string>
 </resources>

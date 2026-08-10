@@ -265,6 +265,8 @@ private fun NavGraphBuilder.toolsGraph(
                 onNavigateBack = navController::popBackStack
             )
         }
+        composable<ExportReport> { ExportScreen(navController::popBackStack) }
+        composable<Compare> { CompareScreen(navController::popBackStack) }
         composable<Settings> {
             SettingsScreen(onNavigateBack = navController::popBackStack)
         }
