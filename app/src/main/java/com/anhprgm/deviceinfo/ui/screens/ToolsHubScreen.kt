@@ -55,10 +55,13 @@ fun ToolsHubScreen(
             verticalArrangement = Arrangement.spacedBy(Dimens.cardSpacing)
         ) {
             item {
+                // Subtitles are single-line; the package-visibility caveat is
+                // too long here and was being ellipsised. It lives on the list
+                // screen itself instead.
                 CategoryCard(
                     icon = Icons.Default.Apps,
                     title = stringResource(R.string.screen_apps),
-                    subtitle = stringResource(R.string.apps_visibility_note),
+                    subtitle = stringResource(R.string.tools_apps_desc),
                     onClick = { onNavigate(AppList) }
                 )
             }
@@ -66,7 +69,7 @@ fun ToolsHubScreen(
                 CategoryCard(
                     icon = Icons.Default.Settings,
                     title = stringResource(R.string.screen_settings),
-                    subtitle = stringResource(R.string.settings_appearance),
+                    subtitle = stringResource(R.string.tools_settings_desc),
                     onClick = { onNavigate(SettingsRoute) }
                 )
             }

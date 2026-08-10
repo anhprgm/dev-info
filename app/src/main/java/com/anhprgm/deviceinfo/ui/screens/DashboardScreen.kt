@@ -133,7 +133,13 @@ fun DashboardScreen(
                 item(span = { GridItemSpan(maxLineSpan) }) {
                     HeroCard(
                         deviceName = d.deviceName,
-                        model = d.model,
+                        // deviceName is already "manufacturer model", so showing
+                        // model underneath just repeated it. Codename/board is
+                        // the genuinely different identifier.
+                        model = listOf(d.device, d.board)
+                            .filter { it.isNotBlank() }
+                            .distinct()
+                            .joinToString(" • "),
                         androidVersion = d.androidVersion,
                         apiLevel = d.apiLevel,
                         uptime = Formatters.duration(d.uptimeMillis),
@@ -186,13 +192,18 @@ fun DashboardScreen(
             }
 
             item {
+                // The headline number is free space, so the label has to say so
+                // — "Storage: 8.02 GB" reads as capacity.
                 StatTile(
                     icon = Icons.Default.Storage,
-                    label = stringResource(R.string.dashboard_storage),
+                    label = stringResource(R.string.dashboard_storage_free),
                     value = Formatters.bytes(hardware?.availableStorageBytes),
                     supporting = hardware?.let {
-                        "${Formatters.percent(it.storageUsagePercent, 0)} " +
-                            stringResource(R.string.common_used).lowercase()
+                        stringResource(
+                            R.string.dashboard_storage_used_of,
+                            Formatters.bytes(it.usedStorageBytes),
+                            Formatters.bytes(it.totalStorageBytes)
+                        )
                     },
                     onClick = { onNavigate(Hardware) }
                 )
@@ -208,8 +219,8 @@ fun DashboardScreen(
             }
             item {
                 StatTile(
-                    icon = Icons.Default.Memory,
-                    label = stringResource(R.string.hardware_cpu_cores),
+                    icon = Icons.Default.DeveloperBoard,
+                    label = stringResource(R.string.dashboard_cpu_cores),
                     value = hardware?.cpuCores?.toString() ?: Formatters.NOT_AVAILABLE,
                     supporting = Formatters.megahertzFromKhz(hardware?.cpuMaxFrequencyKhz),
                     onClick = { onNavigate(Hardware) }
@@ -220,7 +231,13 @@ fun DashboardScreen(
                     icon = Icons.Default.Memory,
                     label = stringResource(R.string.hardware_total_ram),
                     value = Formatters.bytes(hardware?.totalRamBytes),
-                    supporting = Formatters.bytes(hardware?.availableRamBytes),
+                    // A bare second byte figure was ambiguous against the total.
+                    supporting = hardware?.let {
+                        stringResource(
+                            R.string.dashboard_ram_free,
+                            Formatters.bytes(it.availableRamBytes)
+                        )
+                    },
                     onClick = { onNavigate(Hardware) }
                 )
             }

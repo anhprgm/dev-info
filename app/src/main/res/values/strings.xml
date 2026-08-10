@@ -88,6 +88,12 @@
     <string name="dashboard_ram">RAM</string>
     <string name="dashboard_storage">Storage</string>
     <string name="dashboard_temperature">Temperature</string>
+    <string name="dashboard_storage_free">Storage free</string>
+    <string name="dashboard_storage_used_of">%1$s of %2$s used</string>
+    <string name="dashboard_ram_free">%1$s free</string>
+    <string name="dashboard_cpu_cores">CPU cores</string>
+    <string name="tools_apps_desc">Browse apps installed on this device</string>
+    <string name="tools_settings_desc">Theme, colours and about</string>
     <string name="dashboard_categories">Categories</string>
     <string name="dashboard_battery_trend">Battery over time</string>
     <string name="dashboard_no_trend_yet">No samples recorded yet</string>

@@ -88,6 +88,12 @@
     <string name="dashboard_ram">RAM</string>
     <string name="dashboard_storage">Lưu trữ</string>
     <string name="dashboard_temperature">Nhiệt độ</string>
+    <string name="dashboard_storage_free">Lưu trữ trống</string>
+    <string name="dashboard_storage_used_of">Đã dùng %1$s trên %2$s</string>
+    <string name="dashboard_ram_free">Còn trống %1$s</string>
+    <string name="dashboard_cpu_cores">Số nhân CPU</string>
+    <string name="tools_apps_desc">Xem các ứng dụng đã cài trên máy</string>
+    <string name="tools_settings_desc">Chủ đề, màu sắc và giới thiệu</string>
     <string name="dashboard_categories">Danh mục</string>
     <string name="dashboard_battery_trend">Pin theo thời gian</string>
     <string name="dashboard_no_trend_yet">Chưa ghi được mẫu nào</string>

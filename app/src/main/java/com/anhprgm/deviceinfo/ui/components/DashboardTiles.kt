@@ -68,11 +68,14 @@ fun StatTile(
             )
             if (supporting != null) {
                 Spacer(modifier = Modifier.height(Dimens.spaceXs))
+                // Two lines: half-width tiles cannot fit a phrase like
+                // "1.97 GB of 9.70 GB used" on one line, and Vietnamese runs
+                // longer than English throughout.
                 Text(
                     text = supporting,
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
+                    maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
             }
